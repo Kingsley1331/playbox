@@ -1,0 +1,227 @@
+table {
+  width: 50%;
+  height: 200px;
+}
+table,
+th,
+td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+th,
+td {
+  padding: 5px;
+  text-align: left;
+}
+table tr:nth-child(even) {
+  background-color: #eee;
+}
+table tr:nth-child(odd) {
+  background-color: #fff;
+}
+table th {
+  background-color: black;
+  color: white;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+li {
+  float: left;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li a:hover:not(.active) {
+  background-color: #111;
+}
+
+.active {
+  background-color: #4caf50;
+}
+
+#log {
+  float: right;
+}
+
+.auth {
+  color: white;
+  position: absolute;
+  right: 200px;
+  top: 20px;
+}
+
+canvas {
+  /* position: relative;
+  top: 10px;
+  left: 60px;
+  border: 1px solid black; */
+}
+
+.canvasWrapper {
+  display: flex;
+  border: 10px solid black;
+}
+
+.buttons {
+  width: fit-content;
+  border: 0.5px solid lightgray;
+  display: grid;
+  grid-template-columns: 50px 50px;
+  gap: 10px;
+  margin-right: 20px;
+  box-shadow: 5px 2px 15px 0px rgba(0, 0, 0, 0.3);
+}
+
+.image_wrapper {
+  display: flex;
+  background-color: rgb(248, 246, 246);
+  transition: background-color 0.5s;
+}
+div.image_wrapper:hover {
+  background-color: lightblue;
+}
+
+.image_wrapper > img {
+  margin: auto;
+}
+
+.image_wrapper.selected {
+  background-color: lightblue;
+}
+
+.button {
+  background-color: #f44336; /* Green */
+  border: none;
+  color: #ffffff;
+  padding: 15px 32px;
+  text-align: center;
+  -webkit-transition-duration: 0.4s;
+  transition-duration: 0.4s;
+  margin: 16px 0 !important;
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.eventsWrapper {
+  position: relative;
+  top: 680px;
+  border: 1px solid;
+  width: 50%;
+  margin-bottom: 30px;
+  padding: 15px;
+}
+
+.rule {
+  background-color: lightgrey;
+  padding: 10px;
+  margin-top: 15px;
+  border: 1px solid;
+}
+
+.event-form {
+  padding: 10px;
+  position: relative;
+  top: 20px;
+  border: 1px solid;
+  width: 800px;
+  margin-bottom: 50px;
+}
+
+.button-holder {
+  display: flex;
+  justify-content: space-between;
+}
+
+.button-holder,
+.form-types,
+.form-condition,
+.form-action,
+.form-logical_operator,
+.form-condition-group {
+  margin-bottom: 20px;
+}
+
+.event-form select,
+input {
+  margin-right: 20px;
+}
+
+.event-form label {
+  margin-right: 2px;
+}
+
+.form-condition-group {
+  background-color: rgb(230, 230, 240);
+}
+
+.form-condition h4 {
+  width: fit-content;
+  margin: 10px auto;
+}
+
+.add_rule {
+  position: relative;
+  top: 50px;
+}
+
+/* .dg,
+.main,
+.dg > ul {
+  background-color: #fff;
+}
+.react-dat-gui-demo {
+  position: relative;
+  top: 100px;
+  border: 1px solid;
+} */
+
+/* html {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  margin: 0 20px;
+  background-color: #f3eee8;
+  color: #53504d;
+  font: 14px/22px Arial, sans-serif;
+}
+
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.react-dat-gui-demo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.react-dat-gui-relative-position {
+  position: relative;
+  margin-top: 2em;
+  width: 300px;
+  min-width: 300px;
+  right: 0;
+}
+
+@media (max-width: 700px) {
+  .react-dat-gui-demo {
+    flex-direction: column !important;
+  }
+} */
