@@ -134,7 +134,7 @@ export const mouseDown = (element, setManagedShapeIndex) => {
       resizeMousedown(Scene);
       rotateMousedown(Scene);
       colourMousedown(Scene);
-      manageShapeMousedown(Scene, setManagedShapeIndex);
+      // manageShapeMousedown(Scene, setManagedShapeIndex);
     },
     false
   );
