@@ -10,13 +10,17 @@ import Buttons from "./buttons";
 // const animate = dynamic(() => import("./engine/utils/animation"), {
 //   ssr: false, // This ensures the component is not SSR'd
 // });
-let scene = Scene;
+
+const scene = Scene;
+
 const Scenes = ({}) => {
   const [managedShapeIndex, setManagedShapeIndex] = useState(null);
+  const [selected, setSelected] = useState("none");
+
   useEffect(() => {
     /** TODO: move functions into single index file and import **/
     console.log("===========================================scene ", scene);
-    counter;
+
     if (scene) {
       const canvas = document.getElementById("canvas");
       console.log("===========================================canvas ", canvas);
@@ -30,18 +34,24 @@ const Scenes = ({}) => {
   }, []);
 
   useEffect(() => {
+    scene.selected = selected;
+  }, [selected]);
+
+  useEffect(() => {
     animate();
   }, []);
 
-  const [counter, setCounter] = React.useState(0);
+  console.log("scene.selected", scene.selected);
+  console.log("selected", selected);
+
   return (
     <div className="canvasWrapper">
-      <Buttons buttons={Buttons} setManagedShapeIndex={setManagedShapeIndex} />
+      <Buttons
+        buttons={Buttons}
+        setManagedShapeIndex={setManagedShapeIndex}
+        setSelected={setSelected}
+      />
       <canvas id="canvas" width="1200" height="700" />
-      <br />
-      <button onClick={() => setCounter((n) => n + 1)}>increase counter</button>
-      <br />
-      counter: {counter}
     </div>
   );
 };

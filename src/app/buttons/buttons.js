@@ -78,11 +78,11 @@ export const BUTTONS = [
   { name: "manageShape" },
 ];
 
-export const ImgButton = ({ alt, id, src, width, selected, selectShape }) => {
+export const ImgButton = ({ alt, id, src, width, selected, setSelected }) => {
   return (
     <div
       className={`image_wrapper ${selected ? "selected" : ""}`}
-      onClick={selectShape}
+      onClick={setSelected}
     >
       <img alt={alt} id={id} src={src} width={width} />
     </div>

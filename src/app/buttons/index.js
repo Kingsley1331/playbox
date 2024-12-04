@@ -10,7 +10,7 @@ import Scene, { updateSelected } from "../engine/scenes/scene";
 import { ImgButton, BUTTONS } from "./buttons";
 
 /**NOTE: Change confusing variable name selectShape refers to selecting features i.e clone, rotate etc */
-const Buttons = ({ buttons, selectShape, setManagedShapeIndex }) => {
+const Buttons = ({ buttons, setSelected, setManagedShapeIndex }) => {
   return (
     <div className="buttons flex gap-x-5 my-1.5 ml-3">
       {BUTTONS.map(({ name, width = "25", onClick = () => {} }) => (
@@ -21,11 +21,11 @@ const Buttons = ({ buttons, selectShape, setManagedShapeIndex }) => {
           src={`images/${name}.png`}
           width={width}
           selected={buttons[name]}
-          selectShape={() => {
+          setSelected={() => {
             if (Scene.selected === name) {
-              selectShape1("");
+              setSelected("");
             } else {
-              selectShape1(name);
+              setSelected(name);
               setManagedShapeIndex(null);
             }
             onClick();
