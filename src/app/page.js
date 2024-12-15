@@ -1,76 +1,130 @@
 "use client";
-import React, { useEffect, useState, useCallback } from "react";
-import animate from "./engine/utils/animation";
-import { createWall } from "./engine/shapes/walls";
-import Scene from "./engine/scenes/scene";
-import Buttons from "./buttons";
-import reCentre from "./engine/shapes/reCentre";
-import updateScene from "./engine/scenes/updateScene";
-import { clearShapes, shapeSelection } from "./engine/shapes/shapes";
-import {
-  mouseDown,
-  mouseMove,
-  mouseUp,
-  doubleClick,
-  click,
-  rightClick,
-} from "./engine/canvasEvents/listeners";
+import React, { useEffect, useRef } from "react";
+import { World, Vec2, Edge, Box, Testbed } from "planck";
 
-// import dynamic from "next/dynamic";
+let world = new World({
+  gravity: new Vec2(0.0, -10.0),
+});
 
-// const animate = dynamic(() => import("./engine/utils/animation"), {
-//   ssr: false, // This ensures the component is not SSR'd
-// });
+class Renderer {
+  world = null;
+  started = false;
+  context = null;
 
-const scene = Scene;
+  start(world, canvas) {
+    this.world = world;
+    this.context = canvas.getContext("2d");
+
+    // Add listeners
+    world.on("remove-body", this.removeBody);
+    world.on("remove-joint", this.removeJoint);
+    world.on("remove-fixture", this.removeFixture);
+
+    // Start frame loop
+    this.started = true;
+    this.loop(0);
+  }
+
+  stop() {
+    // Remove listeners
+    world.off("remove-body", this.removeBody);
+    world.off("remove-joint", this.removeJoint);
+    world.off("remove-fixture", this.removeFixture);
+
+    // Stop next frame
+    this.started = false;
+  }
+
+  // Game loop
+  loop = (timeStamp) => {
+    if (!this.started) {
+      return;
+    }
+
+    // Clear canvas
+    this.context.clearRect(
+      0,
+      0,
+      this.context.canvas.width,
+      this.context.canvas.height
+    );
+
+    // In each frame call world.step with fixed timeStep
+    this.world.step(1 / 60);
+
+    // Iterate over bodies
+    for (let body = this.world.getBodyList(); body; body = body.getNext()) {
+      this.renderBody(body);
+      // ... and fixtures
+      for (
+        let fixture = body.getFixtureList();
+        fixture;
+        fixture = fixture.getNext()
+      ) {
+        this.renderFixture(fixture);
+      }
+    }
+    // Iterate over joints
+    for (
+      let joint = this.world.getJointList();
+      joint;
+      joint = joint.getNext()
+    ) {
+      this.renderJoint(joint);
+    }
+
+    // Request a new frame
+    window.requestAnimationFrame(this.loop);
+  };
+
+  renderBody(body) {
+    // Render or update body rendering
+    const position = body.getPosition();
+    const angle = body.getAngle();
+    this.context.save();
+    this.context.translate(position.x, position.y);
+    this.context.rotate(angle);
+    this.context.fillStyle = "rgba(255, 0, 0, 0.5)";
+    this.context.fillRect(-0.5, -0.5, 1, 1);
+    this.context.restore();
+  }
+
+  renderFixture(fixture) {
+    // Render or update fixture rendering
+  }
+
+  renderJoint(joint) {
+    // Render or update joint rendering
+  }
+
+  removeBody(body) {
+    // Remove body rendering
+  }
+
+  removeFixture(fixture) {
+    // Remove fixture rendering
+  }
+
+  removeJoint(joint) {
+    // Remove joint from rendering
+  }
+}
+
+const renderer = new Renderer();
 
 const Scenes = ({}) => {
-  const [managedShapeIndex, setManagedShapeIndex] = useState(null);
-  const [selected, setSelected] = useState("none");
+  const canvasRef = useRef(null);
 
   useEffect(() => {
-    /** TODO: move functions into single index file and import **/
-    console.log("===========================================scene ", scene);
-
-    if (scene) {
-      const canvas = document.getElementById("canvas");
-      console.log("===========================================canvas ", canvas);
-      animate();
-      // mouseDown(canvas, setManagedShapeIdx);
-      mouseDown(canvas);
-      mouseMove(canvas);
-      mouseUp(canvas);
-      // doubleClick(canvas, selectShape, addRules, selectedEvent);
-      click(canvas);
-      rightClick(canvas);
-      reCentre(shapeSelection);
-      createWall(canvas, 250);
-      // if (!Object.keys(scene)?.length) {
-      //   createWall(canvas, 250);
-      // }
-      updateScene(scene);
-    }
+    const canvas = canvasRef.current;
+    renderer.start(world, canvas);
+    return () => renderer.stop();
   }, []);
-
-  useEffect(() => {
-    scene.selected = selected;
-  }, [selected]);
-
-  // useEffect(() => {
-  //   animate();
-  // }, []);
-
-  console.log("scene.selected", scene.selected);
-  console.log("selected", selected);
 
   return (
     <div className="canvasWrapper">
-      <Buttons
-        buttons={Buttons}
-        setManagedShapeIndex={setManagedShapeIndex}
-        setSelected={setSelected}
-      />
-      <canvas id="canvas" width="1200" height="700" />
+      <h1>Hello</h1>
+      <canvas ref={canvasRef} id="canvas" width="1200" height="700" />
     </div>
   );
 };
