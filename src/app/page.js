@@ -154,12 +154,13 @@ function CarAndBoxesDemo() {
         ctx.translate(pos.x, pos.y);
         ctx.rotate(angle);
 
-        // Color coding: car is blue, wheels are black, boxes are red
+        // Assign colors with some transparency for the car
         let color = "red";
         if (body === car) {
-          color = "blue";
+          // Car: semi-transparent blue
+          color = "transparent";
         } else if (body === leftWheel || body === rightWheel) {
-          color = "black";
+          color = "transparent";
         }
 
         ctx.fillStyle = color;
