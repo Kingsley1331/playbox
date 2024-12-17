@@ -1,15 +1,16 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import planck, { Vec2 } from "planck";
-import { drawBody, render } from "./helpers/rendering";
+import { drawBody } from "./helpers/rendering";
 
 function Demo4() {
+  const [fps, setFps] = useState(Infinity);
   const canvasRef = useRef(null);
-  const fps = 60;
 
   useEffect(() => {
     const pl = planck;
     const world = new pl.World(new Vec2(0, -10));
+
     const container = world.createKinematicBody();
 
     container.createFixture(new pl.Edge(new Vec2(15, -5), new Vec2(25, 5)));
@@ -76,17 +77,16 @@ function Demo4() {
     }
 
     requestAnimationFrame(render);
-
-    // requestAnimationFrame(() => render(world, fps, canvas, ctx, scale));
-  }, []);
+  }, [fps]);
 
   return (
     <div className="m-3 w-fit">
       <canvas
         ref={canvasRef}
-        width={1000}
-        height={1000}
+        width={800}
+        height={600}
         style={{ border: "1px solid #333" }}
+        onClick={() => setFps(fps === Infinity ? 60 : Infinity)}
       />
     </div>
   );

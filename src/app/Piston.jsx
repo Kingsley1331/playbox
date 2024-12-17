@@ -1,15 +1,17 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import planck, { Vec2 } from "planck";
+import { drawBody } from "./helpers/rendering";
 
-function Demo3() {
+function Piston() {
+  const [fps, setFps] = useState(Infinity);
   const canvasRef = useRef(null);
-  const fps = 60;
 
   useEffect(() => {
-    // planck.testbed("BasicSliderCrank", function (testbed) {
+    {
+      /**********************************Custom code start ************************************/
+    }
     const pl = planck;
-    // Vec2 = pl.Vec2;
     const world = new pl.World(new Vec2(0, -10));
 
     const ground = world.createBody(new Vec2(0.0, 17.0));
@@ -31,7 +33,7 @@ function Demo3() {
     // Define piston
     const piston = world.createDynamicBody({
       fixedRotation: true,
-      position: Vec2(12.0, 20.0),
+      position: new Vec2(12.0, 20.0),
     });
     piston.createFixture(new pl.Box(3.0, 3.0), 2.0);
     world.createJoint(
@@ -47,10 +49,13 @@ function Demo3() {
       )
     );
 
+    {
+      /**********************************Custom code end ************************************/
+    }
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    const scale = 40;
-    const fps = 60;
+    const scale = 15;
 
     function render() {
       world.step(1 / fps);
@@ -60,13 +65,13 @@ function Demo3() {
 
       // Setup transform
       ctx.save();
-      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.translate(canvas.width / 2, canvas.height);
       ctx.scale(1, -1);
       ctx.scale(scale, scale);
 
       // Draw all bodies
       for (let b = world.getBodyList(); b; b = b.getNext()) {
-        drawBody(ctx, b);
+        drawBody(ctx, b, scale);
       }
 
       ctx.restore();
@@ -74,58 +79,20 @@ function Demo3() {
       requestAnimationFrame(render);
     }
 
-    function drawBody(ctx, body) {
-      // console.log("body", body.getFixtureList());
-      for (let f = body.getFixtureList(); f; f = f.getNext()) {
-        const shape = f.getShape();
-        const type = shape.getType();
-        const pos = body.getPosition();
-        const angle = body.getAngle();
-
-        ctx.save();
-        ctx.translate(pos.x, pos.y);
-        ctx.rotate(angle);
-
-        ctx.fillStyle = "transparent";
-        ctx.strokeStyle = "black";
-        ctx.lineWidth = 1 / scale;
-        // console.log("shape.m_vertices", shape.m_vertices);
-
-        if (type === "polygon") {
-          ctx.beginPath();
-          const vertices = shape.m_vertices;
-
-          ctx.moveTo(vertices[0].x, vertices[0].y);
-          for (let i = 1; i < vertices.length; i++) {
-            ctx.lineTo(vertices[i].x, vertices[i].y);
-          }
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-        } else if (type === "circle") {
-          ctx.beginPath();
-          ctx.arc(shape.m_p.x, shape.m_p.y, shape.m_radius, 0, 2 * Math.PI);
-          ctx.fill();
-          ctx.stroke();
-        }
-
-        ctx.restore();
-      }
-    }
-
     requestAnimationFrame(render);
-  }, []);
+  }, [fps]);
 
   return (
     <div className="m-3 w-fit">
       <canvas
         ref={canvasRef}
-        width={3000}
-        height={3000}
+        width={800}
+        height={600}
         style={{ border: "1px solid #333" }}
+        onClick={() => setFps(fps === Infinity ? 60 : Infinity)}
       />
     </div>
   );
 }
 
-export default Demo3;
+export default Piston;

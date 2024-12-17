@@ -1,17 +1,23 @@
 "use client";
 import React from "react";
 import CarAndBoxesDemo from "./CarAndBoxesDemo";
-import Demo2 from "./Demo2";
-import Demo3 from "./Demo3";
-import Demo4 from "./Demo4";
+import Piston from "./Piston";
+import Mixer from "./Mixer";
+import CompoundShapes from "./CompoundShapes";
+import Bridge from "./Bridge";
+import Cantilever from "./Cantilever";
+import Dominos from "./Dominos";
 
 function DemoPage() {
   return (
     <div className=" grid grid-cols-2 justify-start m-3">
-      {/* <CarAndBoxesDemo />
-      <Demo2 /> */}
-      {/* <Demo3 /> */}
-      <Demo4 />
+      <CarAndBoxesDemo />
+      <Piston />
+      <Mixer />
+      <CompoundShapes />
+      <Bridge />
+      <Cantilever />
+      <Dominos />
     </div>
   );
 }

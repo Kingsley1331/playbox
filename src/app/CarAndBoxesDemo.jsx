@@ -1,8 +1,10 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import planck, { Vec2 } from "planck";
+import { drawBody } from "./helpers/rendering";
 
 function CarAndBoxesDemo() {
+  const [fps, setFps] = useState(Infinity);
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -67,7 +69,7 @@ function CarAndBoxesDemo() {
         {
           enableMotor: true,
           motorSpeed: 0,
-          maxMotorTorque,
+          maxMotorTorque: maxMotorTorque,
         },
         car,
         leftWheel,
@@ -80,7 +82,7 @@ function CarAndBoxesDemo() {
         {
           enableMotor: true,
           motorSpeed: 0,
-          maxMotorTorque,
+          maxMotorTorque: maxMotorTorque,
         },
         car,
         rightWheel,
@@ -106,8 +108,7 @@ function CarAndBoxesDemo() {
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    const scale = 20;
-    const fps = 60;
+    const scale = 15;
 
     // Motor speed control variables
     let motorSpeed = 0;
@@ -175,50 +176,6 @@ function CarAndBoxesDemo() {
       requestAnimationFrame(render);
     }
 
-    function drawBody(ctx, body) {
-      for (let f = body.getFixtureList(); f; f = f.getNext()) {
-        const shape = f.getShape();
-        const type = shape.getType();
-        const pos = body.getPosition();
-        const angle = body.getAngle();
-
-        ctx.save();
-        ctx.translate(pos.x, pos.y);
-        ctx.rotate(angle);
-
-        // Color coding with transparent car
-        let color = "red";
-        if (body === car) {
-          color = "transparent"; // semi-transparent blue for car
-        } else if (body === leftWheel || body === rightWheel) {
-          color = "transparent";
-        }
-
-        ctx.fillStyle = color;
-        ctx.strokeStyle = "black";
-        ctx.lineWidth = 1 / scale;
-
-        if (type === "polygon") {
-          ctx.beginPath();
-          const vertices = shape.m_vertices;
-          ctx.moveTo(vertices[0].x, vertices[0].y);
-          for (let i = 1; i < vertices.length; i++) {
-            ctx.lineTo(vertices[i].x, vertices[i].y);
-          }
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-        } else if (type === "circle") {
-          ctx.beginPath();
-          ctx.arc(shape.m_p.x, shape.m_p.y, shape.m_radius, 0, 2 * Math.PI);
-          ctx.fill();
-          ctx.stroke();
-        }
-
-        ctx.restore();
-      }
-    }
-
     requestAnimationFrame(render);
 
     return () => {
@@ -226,15 +183,16 @@ function CarAndBoxesDemo() {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
-  }, []);
+  }, [fps]);
 
   return (
     <div className="m-3 w-fit">
       <canvas
         ref={canvasRef}
-        width={600}
-        height={400}
+        width={800}
+        height={600}
         style={{ border: "1px solid #333" }}
+        onClick={() => setFps(fps === Infinity ? 60 : Infinity)}
       />
     </div>
   );

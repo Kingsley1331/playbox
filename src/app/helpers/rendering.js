@@ -1,5 +1,5 @@
 "use client";
-export function render(world, fps, canvas, ctx, scale) {
+export function render() {
   console.log("world", world);
   console.log("world.step2", world.step);
   console.log("step", step);
@@ -21,7 +21,7 @@ export function render(world, fps, canvas, ctx, scale) {
 
   ctx.restore();
 
-  requestAnimationFrame(() => render(world, fps, canvas, ctx, scale));
+  // requestAnimationFrame(render);
 }
 
 export function drawBody(ctx, body, scale) {
