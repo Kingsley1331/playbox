@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from "react";
 import planck, { Vec2 } from "planck";
 
-function CarAndBoxesDemo() {
+function Demo2() {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -67,7 +67,7 @@ function CarAndBoxesDemo() {
         {
           enableMotor: true,
           motorSpeed: 0,
-          maxMotorTorque,
+          maxMotorTorque: maxMotorTorque,
         },
         car,
         leftWheel,
@@ -80,7 +80,7 @@ function CarAndBoxesDemo() {
         {
           enableMotor: true,
           motorSpeed: 0,
-          maxMotorTorque,
+          maxMotorTorque: maxMotorTorque,
         },
         car,
         rightWheel,
@@ -191,7 +191,7 @@ function CarAndBoxesDemo() {
         if (body === car) {
           color = "transparent"; // semi-transparent blue for car
         } else if (body === leftWheel || body === rightWheel) {
-          color = "transparent";
+          color = "transparent"; // transparent for wheels
         }
 
         ctx.fillStyle = color;
@@ -240,4 +240,4 @@ function CarAndBoxesDemo() {
   );
 }
 
-export default CarAndBoxesDemo;
+export default Demo2;
