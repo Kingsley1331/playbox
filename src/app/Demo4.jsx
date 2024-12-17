@@ -1,16 +1,17 @@
 "use client";
 import React, { useEffect, useRef } from "react";
 import planck, { Vec2 } from "planck";
+import { drawBody, render } from "./helpers/rendering";
 
-function Demo3() {
+function Demo4() {
   const canvasRef = useRef(null);
   const fps = 60;
 
   useEffect(() => {
     const pl = planck;
     const world = new pl.World(new Vec2(0, -10));
-
     const container = world.createKinematicBody();
+
     container.createFixture(new pl.Edge(new Vec2(15, -5), new Vec2(25, 5)));
     container.createFixture(new pl.Circle(new Vec2(-10, -10), 3));
     container.createFixture(new pl.Circle(new Vec2(10, 10), 3));
@@ -37,7 +38,7 @@ function Demo3() {
         );
         particle.setMassData({
           mass: 2,
-          center: Vec2(),
+          center: new Vec2(),
           I: 0.4,
         });
         particle.applyForceToCenter(
@@ -50,7 +51,7 @@ function Demo3() {
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    const scale = 20;
+    const scale = 10;
 
     function render() {
       world.step(1 / fps);
@@ -66,7 +67,7 @@ function Demo3() {
 
       // Draw all bodies
       for (let b = world.getBodyList(); b; b = b.getNext()) {
-        drawBody(ctx, b);
+        drawBody(ctx, b, scale);
       }
 
       ctx.restore();
@@ -74,69 +75,21 @@ function Demo3() {
       requestAnimationFrame(render);
     }
 
-    function drawBody(ctx, body) {
-      for (let f = body.getFixtureList(); f; f = f.getNext()) {
-        const shape = f.getShape();
-        const type = shape.getType();
-        const pos = body.getPosition();
-        const angle = body.getAngle();
-
-        ctx.save();
-        ctx.translate(pos.x, pos.y);
-        ctx.rotate(angle);
-
-        ctx.fillStyle = "transparent";
-        ctx.strokeStyle = "black";
-        ctx.lineWidth = 1 / scale;
-
-        if (type === "polygon") {
-          ctx.beginPath();
-          const vertices = shape.m_vertices;
-
-          ctx.moveTo(vertices[0].x, vertices[0].y);
-          for (let i = 1; i < vertices.length; i++) {
-            ctx.lineTo(vertices[i].x, vertices[i].y);
-          }
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-        } else if (type === "circle") {
-          ctx.beginPath();
-          ctx.arc(shape.m_p.x, shape.m_p.y, shape.m_radius, 0, 2 * Math.PI);
-          ctx.fill();
-          ctx.stroke();
-        } else if (type === "edge") {
-          ctx.beginPath();
-          ctx.moveTo(shape.m_vertex1.x, shape.m_vertex1.y);
-          ctx.lineTo(shape.m_vertex2.x, shape.m_vertex2.y);
-          ctx.stroke();
-        } else if (type === "chain") {
-          ctx.beginPath();
-          const vertices = shape.m_vertices;
-          ctx.moveTo(vertices[0].x, vertices[0].y);
-          for (let i = 1; i < vertices.length; i++) {
-            ctx.lineTo(vertices[i].x, vertices[i].y);
-          }
-          ctx.stroke();
-        }
-
-        ctx.restore();
-      }
-    }
-
     requestAnimationFrame(render);
+
+    // requestAnimationFrame(() => render(world, fps, canvas, ctx, scale));
   }, []);
 
   return (
     <div className="m-3 w-fit">
       <canvas
         ref={canvasRef}
-        width={3000}
-        height={3000}
+        width={1000}
+        height={1000}
         style={{ border: "1px solid #333" }}
       />
     </div>
   );
 }
 
-export default Demo3;
+export default Demo4;
