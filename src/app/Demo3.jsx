@@ -114,9 +114,6 @@ function Demo3() {
     }
 
     requestAnimationFrame(render);
-
-    // return world;
-    // });
   }, []);
 
   return (

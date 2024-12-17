@@ -51,7 +51,6 @@ function Demo3() {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const scale = 20;
-    const fps = 60;
 
     function render() {
       world.step(1 / fps);
@@ -76,14 +75,11 @@ function Demo3() {
     }
 
     function drawBody(ctx, body) {
-      // console.log("body", body.getFixtureList());
       for (let f = body.getFixtureList(); f; f = f.getNext()) {
         const shape = f.getShape();
         const type = shape.getType();
         const pos = body.getPosition();
         const angle = body.getAngle();
-
-        console.log("type", type);
 
         ctx.save();
         ctx.translate(pos.x, pos.y);
@@ -92,7 +88,6 @@ function Demo3() {
         ctx.fillStyle = "transparent";
         ctx.strokeStyle = "black";
         ctx.lineWidth = 1 / scale;
-        // console.log("shape.m_vertices", shape.m_vertices);
 
         if (type === "polygon") {
           ctx.beginPath();
@@ -109,6 +104,19 @@ function Demo3() {
           ctx.beginPath();
           ctx.arc(shape.m_p.x, shape.m_p.y, shape.m_radius, 0, 2 * Math.PI);
           ctx.fill();
+          ctx.stroke();
+        } else if (type === "edge") {
+          ctx.beginPath();
+          ctx.moveTo(shape.m_vertex1.x, shape.m_vertex1.y);
+          ctx.lineTo(shape.m_vertex2.x, shape.m_vertex2.y);
+          ctx.stroke();
+        } else if (type === "chain") {
+          ctx.beginPath();
+          const vertices = shape.m_vertices;
+          ctx.moveTo(vertices[0].x, vertices[0].y);
+          for (let i = 1; i < vertices.length; i++) {
+            ctx.lineTo(vertices[i].x, vertices[i].y);
+          }
           ctx.stroke();
         }
 
