@@ -12,12 +12,12 @@ function DemoPage() {
   return (
     <div className=" grid grid-cols-2 justify-start m-3">
       <CarAndBoxesDemo />
-      <Piston />
       <Mixer />
       <CompoundShapes />
       <Bridge />
       <Cantilever />
       <Dominos />
+      <Piston />
     </div>
   );
 }

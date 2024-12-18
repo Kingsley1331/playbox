@@ -1,8 +1,5 @@
 "use client";
-export function render() {
-  console.log("world", world);
-  console.log("world.step2", world.step);
-  console.log("step", step);
+export function render(world, ctx, scale, fps, drawBody, canvas) {
   world.step(1 / fps);
 
   // Clear the canvas
@@ -10,7 +7,7 @@ export function render() {
 
   // Setup transform
   ctx.save();
-  ctx.translate(canvas.width / 2, canvas.height / 2);
+  ctx.translate(canvas.width / 2, canvas.height);
   ctx.scale(1, -1);
   ctx.scale(scale, scale);
 
@@ -21,7 +18,7 @@ export function render() {
 
   ctx.restore();
 
-  // requestAnimationFrame(render);
+  requestAnimationFrame(() => render(world, ctx, scale, fps, drawBody, canvas));
 }
 
 export function drawBody(ctx, body, scale) {

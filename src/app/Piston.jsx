@@ -1,7 +1,8 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import planck, { Vec2 } from "planck";
-import { drawBody } from "./helpers/rendering";
+import { drawBody, render } from "./helpers/rendering";
+// import { render } from "./render";
 
 function Piston() {
   const [fps, setFps] = useState(Infinity);
@@ -57,29 +58,7 @@ function Piston() {
     const ctx = canvas.getContext("2d");
     const scale = 15;
 
-    function render() {
-      world.step(1 / fps);
-
-      // Clear the canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Setup transform
-      ctx.save();
-      ctx.translate(canvas.width / 2, canvas.height);
-      ctx.scale(1, -1);
-      ctx.scale(scale, scale);
-
-      // Draw all bodies
-      for (let b = world.getBodyList(); b; b = b.getNext()) {
-        drawBody(ctx, b, scale);
-      }
-
-      ctx.restore();
-
-      requestAnimationFrame(render);
-    }
-
-    requestAnimationFrame(render);
+    render(world, ctx, scale, fps, drawBody, canvas);
   }, [fps]);
 
   return (
