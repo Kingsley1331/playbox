@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import planck, { Vec2 } from "planck";
-import { drawBody, render } from "./helpers/rendering";
+import { render } from "./helpers/rendering";
 // import { render } from "./render";
 
 function Piston() {
@@ -58,7 +58,10 @@ function Piston() {
     const ctx = canvas.getContext("2d");
     const scale = 15;
 
-    render(world, ctx, scale, fps, drawBody, canvas);
+    render(world, ctx, scale, fps, canvas, {
+      x: canvas.width / 2,
+      y: canvas.height,
+    });
   }, [fps]);
 
   return (

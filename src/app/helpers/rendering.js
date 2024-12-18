@@ -1,13 +1,19 @@
 "use client";
-export function render(world, ctx, scale, fps, drawBody, canvas) {
+export function render(
+  world,
+  ctx,
+  scale,
+  fps,
+  canvas,
+  // translation
+  translation = { x: canvas.width / 2, y: canvas.height / 2 }
+) {
   world.step(1 / fps);
-
   // Clear the canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
   // Setup transform
   ctx.save();
-  ctx.translate(canvas.width / 2, canvas.height);
+  ctx.translate(translation.x, translation.y);
   ctx.scale(1, -1);
   ctx.scale(scale, scale);
 
@@ -18,7 +24,9 @@ export function render(world, ctx, scale, fps, drawBody, canvas) {
 
   ctx.restore();
 
-  requestAnimationFrame(() => render(world, ctx, scale, fps, drawBody, canvas));
+  requestAnimationFrame(() =>
+    render(world, ctx, scale, fps, canvas, translation)
+  );
 }
 
 export function drawBody(ctx, body, scale) {
