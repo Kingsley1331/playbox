@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import planck, { Vec2 } from "planck";
 import { render } from "../helpers/rendering";
 
-function Demo4() {
+function Mixer() {
   const [fps, setFps] = useState(Infinity);
   const canvasRef = useRef(null);
 
@@ -77,4 +77,4 @@ function Demo4() {
   );
 }
 
-export default Demo4;
+export default Mixer;
