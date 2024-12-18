@@ -1,12 +1,12 @@
 "use client";
 import React from "react";
-import CarAndBoxesDemo from "./CarAndBoxesDemo";
-import Piston from "./Piston";
-import Mixer from "./Mixer";
-import CompoundShapes from "./CompoundShapes";
-import Bridge from "./Bridge";
-import Cantilever from "./Cantilever";
-import Dominos from "./Dominos";
+import CarAndBoxesDemo from "./demos/CarAndBoxesDemo";
+import Piston from "./demos/Piston";
+import Mixer from "./demos/Mixer";
+import CompoundShapes from "./demos/CompoundShapes";
+import Bridge from "./demos/Bridge";
+import Cantilever from "./demos/Cantilever";
+import Dominos from "./demos/Dominos";
 
 function DemoPage() {
   return (

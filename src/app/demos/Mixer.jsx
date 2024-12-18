@@ -1,13 +1,16 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import planck, { Vec2 } from "planck";
-import { drawBody } from "./helpers/rendering";
+import { render } from "../helpers/rendering";
 
 function Demo4() {
   const [fps, setFps] = useState(Infinity);
   const canvasRef = useRef(null);
 
   useEffect(() => {
+    {
+      /**********************************Custom code start ************************************/
+    }
     const pl = planck;
     const world = new pl.World(new Vec2(0, -10));
 
@@ -50,33 +53,15 @@ function Demo4() {
 
     container.setAngularVelocity(0.3);
 
+    {
+      /**********************************Custom code end ************************************/
+    }
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const scale = 10;
 
-    function render() {
-      world.step(1 / fps);
-
-      // Clear the canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Setup transform
-      ctx.save();
-      ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.scale(1, -1);
-      ctx.scale(scale, scale);
-
-      // Draw all bodies
-      for (let b = world.getBodyList(); b; b = b.getNext()) {
-        drawBody(ctx, b, scale);
-      }
-
-      ctx.restore();
-
-      requestAnimationFrame(render);
-    }
-
-    requestAnimationFrame(render);
+    render(world, ctx, scale, fps, canvas);
   }, [fps]);
 
   return (

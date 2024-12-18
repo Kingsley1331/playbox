@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import planck, { Vec2 } from "planck";
-import { render } from "./helpers/rendering";
+import { render } from "../helpers/rendering";
 // import { render } from "./render";
 
 function Piston() {

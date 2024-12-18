@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import planck, { Vec2 } from "planck";
-import { drawBody } from "./helpers/rendering";
+import { drawBody } from "../helpers/rendering";
 
 function CarAndBoxesDemo() {
   const [fps, setFps] = useState(Infinity);
