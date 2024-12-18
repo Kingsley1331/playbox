@@ -39,6 +39,8 @@ export function drawBody(ctx, body, scale) {
     ctx.strokeStyle = "black";
     ctx.lineWidth = 1 / scale;
 
+    // console.log("=========>type", type);
+
     if (type === "polygon") {
       ctx.beginPath();
       const vertices = shape.m_vertices;
