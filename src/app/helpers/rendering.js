@@ -30,6 +30,8 @@ export function render(
 }
 
 export function drawBody(ctx, body, scale) {
+  const colour = "rgb(175, 224, 230, 0.7)";
+  // const colour = "rgba(196, 203, 2000, 0.5)";
   for (let f = body.getFixtureList(); f; f = f.getNext()) {
     const shape = f.getShape();
     const type = shape.getType();
@@ -40,7 +42,8 @@ export function drawBody(ctx, body, scale) {
     ctx.translate(pos.x, pos.y);
     ctx.rotate(angle);
 
-    ctx.fillStyle = "transparent";
+    ctx.fillStyle = colour;
+    // ctx.fillStyle = "transparent";
     ctx.strokeStyle = "black";
     ctx.lineWidth = 1 / scale;
 
