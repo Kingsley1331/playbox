@@ -16,10 +16,11 @@ import Pulleys from "./demos/Pulleys";
 import ConveyorBelt from "./demos/ConveyorBelt";
 import ContinuousTest from "./demos/ContinuousTest";
 import Car from "./demos/Car";
+import Strandbeest from "./demos/Strandbeest";
 
 function DemoPage() {
   return (
-    <div className=" grid grid-cols-2 justify-start m-3">
+    <div className=" grid grid-cols-1 justify-start m-3">
       {/* <Motor /> */}
       <CarAndBoxesDemo />
       <Mixer />
@@ -36,6 +37,7 @@ function DemoPage() {
       <ConveyorBelt />
       <ContinuousTest />
       <Car />
+      <Strandbeest />
     </div>
   );
 }
