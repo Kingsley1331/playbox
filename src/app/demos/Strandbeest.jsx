@@ -5,7 +5,7 @@ import { render } from "../helpers/rendering";
 
 function Strandbeest() {
   const [fps, setFps] = useState(Infinity);
-  const [motorSpeed, setMotorSpeed] = useState(0);
+  const [motorSpeed, setMotorSpeed] = useState(2);
   const canvasRef = useRef(null);
 
   useEffect(() => {

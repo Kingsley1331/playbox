@@ -91,7 +91,7 @@ function Piston() {
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    const scale = 15;
+    const scale = 20;
 
     render(world, ctx, scale, fps, canvas, {
       x: canvas.width / 2,

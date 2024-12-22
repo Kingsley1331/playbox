@@ -11,24 +11,26 @@ function ConveyorBelt() {
     {
       /**********************************Custom code start ************************************/
     }
-    var pl = planck,
-      Vec2 = pl.Vec2;
-    var world = new pl.World(Vec2(0, -10));
+    var pl = planck;
+    var world = new pl.World(new Vec2(0, -10));
 
     // Ground
     var ground = world.createBody();
-    ground.createFixture(pl.Edge(Vec2(-20.0, 0.0), Vec2(20.0, 0.0)), 0.0);
+    ground.createFixture(
+      new pl.Edge(new Vec2(-20.0, 0.0), new Vec2(20.0, 0.0)),
+      0.0
+    );
 
     // Platform
     var platform = world
-      .createBody(Vec2(-5.0, 5.0))
-      .createFixture(pl.Box(10.0, 0.5), { friction: 0.8 });
+      .createBody(new Vec2(-5.0, 5.0))
+      .createFixture(new pl.Box(10.0, 0.5), { friction: 0.8 });
 
     // Boxes
-    for (var i = 0; i < 5; ++i) {
+    for (let i = 0; i < 5; ++i) {
       world
-        .createDynamicBody(Vec2(-10.0 + 2.0 * i, 7.0))
-        .createFixture(pl.Box(0.5, 0.5), 20.0);
+        .createDynamicBody(new Vec2(-10.0 + 2.0 * i, 7.0))
+        .createFixture(new pl.Box(0.5, 0.5), 20.0);
     }
 
     world.on("pre-solve", function (contact, oldManifold) {

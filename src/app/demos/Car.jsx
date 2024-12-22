@@ -128,14 +128,13 @@ function Car() {
 
     // Car
     const size = 3;
-    const car = world.createDynamicBody(new Vec2(0.0, 1.0 * size));
 
-    const carX = 0;
-    const carY = 1 * size;
     // const car = world.createBody({
     //   type: "dynamic",
-    //   position: new Vec2(carX, carY),
+    //   position: new Vec2(0.0, 1.0 * size),
     // });
+
+    const car = world.createDynamicBody(new Vec2(0.0, 1.0 * size));
     car.createFixture(
       new pl.Polygon([
         new Vec2(-1.5 * size, -0.5 * size),
