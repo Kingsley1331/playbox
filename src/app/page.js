@@ -122,9 +122,9 @@ function HomePage() {
 
     const pivot = world.createBody(new Vec2(100, pivotHeight));
 
-    const crank = world.createDynamicBody(new Vec2(92, pivotHeight + 3));
+    const crank = world.createDynamicBody(new Vec2(100, pivotHeight + 3));
 
-    crank.createFixture(new pl.Box(4.0, 1.0), {
+    crank.createFixture(new pl.Box(8.0, 1.0), {
       density: 1,
       friction: 0,
       restitution: 0.1,
@@ -149,6 +149,25 @@ function HomePage() {
       ]),
       1.0
     );
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    const bottom = new pl.Box(1.5, 0.15);
+    const left = new pl.Box(0.15, 2.7, new Vec2(-1.45, 2.35), 0.2);
+    const right = new pl.Box(0.15, 2.7, new Vec2(1.45, 2.35), -0.2);
+
+    const container = world.createDynamicBody(new Vec2(50, -40));
+    container.createFixture(bottom, 4.0);
+    container.createFixture(left, 4.0);
+    container.createFixture(right, 4.0);
+
+    const bottom2 = new pl.Box(1.5, 0.15);
+    const left2 = new pl.Box(0.15, 2.7, new Vec2(-2, 4), 0.2);
+    const right2 = new pl.Box(0.15, 2.7, new Vec2(2, 4), -0.2);
+
+    const container2 = world.createDynamicBody(new Vec2(60, -40));
+    container2.createFixture(bottom2, 4.0);
+    container2.createFixture(left2, 4.0);
+    container2.createFixture(right2, 4.0);
 
     render(world, ctx, scale, fps, canvas, {
       x: 0,
