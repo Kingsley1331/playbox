@@ -10,6 +10,9 @@ export default function Navbar() {
         <li>
           <Link href="/demos1">Demos</Link>
         </li>
+        <li>
+          <Link href="/lab">Lab</Link>
+        </li>
       </ul>
     </nav>
   );

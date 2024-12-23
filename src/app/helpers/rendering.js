@@ -5,7 +5,6 @@ export function render(
   scale,
   fps,
   canvas,
-  // translation
   translation = { x: canvas.width / 2, y: canvas.height / 2 }
 ) {
   world.step(1 / fps);
@@ -79,7 +78,13 @@ export function drawBody(ctx, body, scale) {
       }
       ctx.stroke();
     }
-
     ctx.restore();
   }
+  // // ctx.save();
+  // ctx.translate(100, -10);
+  // ctx.fillStyle = "black";
+  // ctx.font = "1px Arial";
+  // ctx.fillText(`x: ${mousePos.x}`, -50, 10 / scale);
+  // ctx.fillText(`y: ${mousePos.y}`, -50, -30 / scale);
+  // ctx.restore();
 }

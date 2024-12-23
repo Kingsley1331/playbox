@@ -1,9 +1,9 @@
 import planck, { Vec2 } from "planck";
 
 export const createWalls = (world, canvas, scale) => {
-  const groundHeight = -canvas.height / scale;
-  const canvasWidth = canvas.width / scale;
-  const canvasHeight = canvas.height / scale;
+  const groundHeight = -canvas?.height / scale;
+  const canvasWidth = canvas?.width / scale;
+  const canvasHeight = canvas?.height / scale;
 
   const ground = world.createBody();
   // Bottom edge
