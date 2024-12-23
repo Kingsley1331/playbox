@@ -8,14 +8,15 @@ import Navbar from "./components/Navbar";
 function HomePage() {
   const [fps, setFps] = useState(Infinity);
   const canvasRef = useRef(null);
+  const [carVanish, setCarVanish] = useState(false);
 
+  const pl = planck;
+  const world = new pl.World(new Vec2(0, -10));
+  let car = null;
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const scale = 20;
-
-    const pl = planck;
-    const world = new pl.World(new Vec2(0, -10));
 
     createWalls(world, canvas, scale);
 
@@ -38,7 +39,7 @@ function HomePage() {
     const carWidth = 2;
     const carHeight = 0.5;
 
-    const car = world.createDynamicBody(new Vec2(carX, carY));
+    car = world.createDynamicBody(new Vec2(carX, carY));
 
     car.createFixture(new pl.Box(carWidth, carHeight), {
       density: 1,
@@ -169,11 +170,37 @@ function HomePage() {
     container2.createFixture(left2, 4.0);
     container2.createFixture(right2, 4.0);
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //delete body or joint
+    // world.destroyBody(container2);
+    // world.destroyJoint(leftJoint);
+
+    // if (car && carVanish) {
+    //   console.log("Car vanished");
+    //   world.destroyBody(car);
+    // }
+
     render(world, ctx, scale, fps, canvas, {
       x: 0,
       y: 0,
     });
-  }, [fps]);
+  }, [fps /*carVanish*/]);
+
+  // Detect collisions
+
+  world.on("begin-contact", (contact) => {
+    const fixtureA = contact.getFixtureA();
+    const fixtureB = contact.getFixtureB();
+
+    const bodyA = fixtureA.getBody();
+    const bodyB = fixtureB.getBody();
+
+    if (bodyA === car || bodyB === car) {
+      // console.log("bodaA", bodyA);
+      console.log("Car collided with something");
+      setCarVanish(true);
+    }
+  });
 
   return (
     <div>
