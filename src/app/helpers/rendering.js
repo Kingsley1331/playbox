@@ -7,7 +7,7 @@ export function render(
   canvas,
   translation = { x: canvas.width / 2, y: canvas.height / 2 }
 ) {
-  world.step(1 / fps);
+  world?.step(1 / fps);
   // Clear the canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   // Setup transform
@@ -17,7 +17,7 @@ export function render(
   ctx.scale(scale, scale);
 
   // Draw all bodies
-  for (let b = world.getBodyList(); b; b = b.getNext()) {
+  for (let b = world?.getBodyList(); b; b = b.getNext()) {
     drawBody(ctx, b, scale);
   }
 

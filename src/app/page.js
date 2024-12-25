@@ -123,18 +123,20 @@ function HomePage() {
 
     const pivot = world.createBody(new Vec2(100, pivotHeight));
 
-    const crank = world.createDynamicBody(new Vec2(100, pivotHeight + 3));
+    const pendulum = world.createDynamicBody(new Vec2(100, pivotHeight + 3));
 
-    crank.createFixture(new pl.Box(8.0, 1.0), {
+    pendulum.createFixture(new pl.Box(8.0, 1.0), {
       density: 1,
       friction: 0,
       restitution: 0.1,
     });
-    // crank.createFixture(new pl.Box(4.0, 1.0), 2.0);
+    // pendulum.createFixture(new pl.Box(4.0, 1.0), 2.0);
 
     world.createJoint(
-      new pl.RevoluteJoint({}, pivot, crank, new Vec2(88, pivotHeight + 3))
+      new pl.RevoluteJoint({}, pivot, pendulum, new Vec2(88, pivotHeight + 3))
     );
+
+    console.log("Pendulum type", pendulum.getFixtureList());
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     const size = 5;
