@@ -1,4 +1,49 @@
 "use client";
+
+export function render2(
+  worldRef,
+  ctxRef,
+  scale,
+  fps,
+  canvasRef,
+  translation = { x: canvas.width / 2, y: canvas.height / 2 },
+  isPausedRef
+) {
+  const canvas = canvasRef.current;
+  if (!isPausedRef.current && worldRef?.current && ctxRef.current) {
+    const world = worldRef.current;
+    const ctx = ctxRef.current;
+
+    world?.step(1 / fps);
+    // Clear the canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Setup transform
+    ctx.save();
+    ctx.translate(translation.x, translation.y);
+    ctx.scale(1, -1);
+    ctx.scale(scale, scale);
+
+    // Draw all bodies
+    for (let b = world?.getBodyList(); b; b = b.getNext()) {
+      drawBody(ctx, b, scale);
+    }
+
+    ctx.restore();
+
+    requestAnimationFrame(() =>
+      render2(
+        worldRef,
+        ctxRef,
+        20,
+        60,
+        canvasRef,
+        { x: canvasRef.current.width / 2, y: canvasRef.current.height / 2 },
+        isPausedRef
+      )
+    );
+  }
+}
+
 export function render(
   world,
   ctx,
