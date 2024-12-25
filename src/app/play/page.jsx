@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import planck, { Vec2 } from "planck";
 import Navbar from "../components/Navbar";
+import { render } from "../helpers/rendering";
 
 function BouncingBall() {
   const canvasRef = useRef(null);
@@ -11,8 +12,16 @@ function BouncingBall() {
   const isPausedRef = useRef(false); // Track pause state in ref
   const [isPaused, setIsPaused] = useState(false);
 
-  const render = () => {
-    if (!isPausedRef.current && worldRef.current && ctxRef.current) {
+  const render = (
+    worldRef,
+    ctxRef,
+    scale,
+    fps,
+    canvasRef,
+    translation,
+    isPausedRef
+  ) => {
+    if (!isPausedRef.current && worldRef?.current && ctxRef.current) {
       worldRef.current.step(1 / 60);
 
       const canvas = canvasRef.current;
@@ -21,7 +30,7 @@ function BouncingBall() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       ctx.save();
-      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.translate(translation.x, translation.y);
       ctx.scale(20, -20);
 
       // Draw ground
@@ -31,7 +40,7 @@ function BouncingBall() {
       ctx.strokeStyle = "#000";
       ctx.stroke();
 
-      // Draw ball
+      // Draw ball/body
       for (
         let body = worldRef.current.getBodyList();
         body;
@@ -47,7 +56,17 @@ function BouncingBall() {
       }
 
       ctx.restore();
-      frameIdRef.current = requestAnimationFrame(render);
+      frameIdRef.current = requestAnimationFrame(() =>
+        render(
+          worldRef,
+          ctxRef,
+          1,
+          60,
+          canvasRef,
+          { x: canvasRef.current.width / 2, y: canvasRef.current.height / 2 },
+          isPausedRef
+        )
+      );
     }
   };
 
@@ -76,7 +95,17 @@ function BouncingBall() {
     const canvas = canvasRef.current;
     ctxRef.current = canvas.getContext("2d");
 
-    frameIdRef.current = requestAnimationFrame(render);
+    frameIdRef.current = requestAnimationFrame(() =>
+      render(
+        worldRef,
+        ctxRef,
+        1,
+        60,
+        canvasRef,
+        { x: canvasRef.current.width / 2, y: canvasRef.current.height / 2 },
+        isPausedRef
+      )
+    );
 
     return () => {
       cancelAnimationFrame(frameIdRef.current);
@@ -89,7 +118,17 @@ function BouncingBall() {
     setIsPaused(!isPaused);
 
     if (!isPausedRef.current) {
-      frameIdRef.current = requestAnimationFrame(render);
+      frameIdRef.current = requestAnimationFrame(() =>
+        render(
+          worldRef,
+          ctxRef,
+          1,
+          60,
+          canvasRef,
+          { x: canvasRef.current.width / 2, y: canvasRef.current.height / 2 },
+          isPausedRef
+        )
+      );
     }
   };
 
