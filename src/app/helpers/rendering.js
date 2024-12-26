@@ -36,8 +36,8 @@ export function render2(
       render2(
         worldRef,
         ctxRef,
-        20,
-        60,
+        scale,
+        fps,
         canvasRef,
         { x: translation.x, y: translation.y },
         isPausedRef

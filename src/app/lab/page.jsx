@@ -9,12 +9,12 @@ import { mouseEvents } from "../helpers/utilities";
 function Lab() {
   //   console.log("==============================================>Lab");
   const scale = 20;
-  const [fps, setFps] = useState(Infinity);
+  const [fps, setFps] = useState(60);
   const canvasRef = useRef(null);
   const worldRef = useRef(null);
   const ctxRef = useRef(null);
   const isPausedRef = useRef(false); // Track pause state in ref
-  const [isPaused, setIsPaused] = useState(false);
+  const [isPaused, setIsPaused] = useState(true);
   const [reset, setReset] = useState(false);
   const [carVanish, setCarVanish] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -177,15 +177,14 @@ function Lab() {
     //     setCarVanish(true);
     //   }
     // });
-  }, [reset]);
+    isPausedRef.current = true;
+  }, [fps]);
 
-  const handlePauseToggle = (state) => {
+  const handlePauseToggle = () => {
     isPausedRef.current = !isPausedRef.current;
-    if (state !== undefined) {
-      setIsPaused(state);
-    } else {
-      setIsPaused(!isPaused);
-    }
+    // setFps(fps === Infinity ? 60 : Infinity);
+
+    setIsPaused(!isPaused);
 
     if (!isPausedRef.current) {
       render2(
@@ -207,7 +206,7 @@ function Lab() {
         onClick={handlePauseToggle}
         className="px-4 py-2 bg-blue-500 text-white rounded"
       >
-        {isPaused ? "Resume" : "Pause"}
+        {isPaused ? "Play" : "Pause"}
       </button>
       {/* <button
         onClick={() => setReset(!reset)}
@@ -223,9 +222,9 @@ function Lab() {
           width={2400}
           height={1200}
           style={{ border: "1px solid #333" }}
-          onClick={() => {
-            setFps(fps === Infinity ? 60 : Infinity);
-          }}
+          // onClick={() => {
+          //   setFps(fps === Infinity ? 60 : Infinity);
+          // }}
         />
       </div>
     </div>
