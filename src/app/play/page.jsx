@@ -44,7 +44,7 @@ function BouncingBall() {
       scale,
       60,
       canvasRef,
-      { x: canvasRef.current.width / 2, y: canvasRef.current.height / 2 },
+      { x: canvasRef.current.width, y: canvasRef.current.height },
       isPausedRef
     );
   }, []);
