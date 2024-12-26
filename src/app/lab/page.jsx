@@ -18,6 +18,13 @@ function Lab() {
   const [reset, setReset] = useState(false);
   const [carVanish, setCarVanish] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const carRef = useRef(null);
+
+  useEffect(() => {
+    if (carRef && carVanish) {
+      worldRef.current.destroyBody(carRef.current);
+    }
+  }, [carVanish]);
 
   useEffect(() => {
     const pl = planck;
@@ -77,6 +84,7 @@ function Lab() {
     const carHeight = 0.5;
 
     car = world.createDynamicBody(new Vec2(carX, carY));
+    carRef.current = car;
 
     car.createFixture(new pl.Box(carWidth, carHeight), {
       density: 1,
@@ -150,39 +158,26 @@ function Lab() {
       isPausedRef
     );
 
-    // if (car && carVanish) {
-    // world.destroyBody(car);
-    // }
-
-    //   useEffect(() => {
-    //     console.log("car", car);
-    //     if (car && carVanish) {
-    //       console.log("Car vanished");
-    //       world.destroyBody(car);
-    //     }
-    //   }, [carVanish]);
-
     // Detect collisions
-    // world.on("begin-contact", (contact) => {
-    //   console.log("Collided with something");
-    //   const fixtureA = contact.getFixtureA();
-    //   const fixtureB = contact.getFixtureB();
+    world.on("begin-contact", (contact) => {
+      console.log("Collided with something");
+      const fixtureA = contact.getFixtureA();
+      const fixtureB = contact.getFixtureB();
 
-    //   const bodyA = fixtureA.getBody();
-    //   const bodyB = fixtureB.getBody();
+      const bodyA = fixtureA.getBody();
+      const bodyB = fixtureB.getBody();
 
-    //   if (bodyA === car || bodyB === car) {
-    //     // console.log("bodaA", bodyA);
-    //     console.log("Car collided with something");
-    //     setCarVanish(true);
-    //   }
-    // });
+      if (bodyA === car || bodyB === car) {
+        console.log("Car collided with something");
+        setCarVanish(true);
+      }
+    });
+
     isPausedRef.current = true;
-  }, [fps]);
+  }, []);
 
   const handlePauseToggle = () => {
     isPausedRef.current = !isPausedRef.current;
-    // setFps(fps === Infinity ? 60 : Infinity);
 
     setIsPaused(!isPaused);
 
@@ -208,12 +203,7 @@ function Lab() {
       >
         {isPaused ? "Play" : "Pause"}
       </button>
-      {/* <button
-        onClick={() => setReset(!reset)}
-        className="px-4 py-2 bg-blue-500 text-white rounded"
-      >
-        Reset
-      </button> */}
+
       <div className="m-3 w-fit">
         X: {mousePos.x.toFixed(0)}, Y:{mousePos.y.toFixed(0)}
         <canvas
@@ -222,9 +212,6 @@ function Lab() {
           width={2400}
           height={1200}
           style={{ border: "1px solid #333" }}
-          // onClick={() => {
-          //   setFps(fps === Infinity ? 60 : Infinity);
-          // }}
         />
       </div>
     </div>

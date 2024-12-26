@@ -9,12 +9,10 @@ export function render2(
   translation = { x: canvas.width / 2, y: canvas.height / 2 },
   isPausedRef
 ) {
-  console.log(translation);
   const canvas = canvasRef.current;
   if (!isPausedRef.current && worldRef?.current && ctxRef.current) {
     const world = worldRef.current;
     const ctx = ctxRef.current;
-    console.log("fps", fps);
 
     world?.step(1 / fps);
     // Clear the canvas
