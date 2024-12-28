@@ -19,6 +19,8 @@ function Lab() {
   const [carVanish, setCarVanish] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const carRef = useRef(null);
+  const mouseJointRef = useRef(null);
+  const selectedBodyRef = useRef(null);
 
   useEffect(() => {
     if (carRef && carVanish) {
@@ -30,6 +32,9 @@ function Lab() {
     const pl = planck;
     const world = new pl.World(new Vec2(0, -10));
     worldRef.current = world;
+
+    // Add a ground body for the mouse joint
+    const groundBody = world.createBody();
 
     // Stack of boxes
     const stackX = 90;
@@ -174,6 +179,58 @@ function Lab() {
     });
 
     isPausedRef.current = true;
+
+    // Update the mouse joint definition
+    const md = {
+      maxForce: 10000.0,
+      frequencyHz: 5.0,
+      dampingRatio: 0.9,
+    };
+
+    canvas.addEventListener("mousedown", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / scale;
+      const y = (e.clientY - rect.top) / -scale;
+
+      const aabb = new pl.AABB(
+        new Vec2(x - 0.01, y - 0.01),
+        new Vec2(x + 0.01, y + 0.01)
+      );
+
+      let selectedBody = null;
+      world.queryAABB(aabb, (fixture) => {
+        if (fixture.getBody().isDynamic()) {
+          selectedBody = fixture.getBody();
+          return false;
+        }
+        return true;
+      });
+
+      if (selectedBody) {
+        selectedBodyRef.current = selectedBody;
+        const mouseJoint = world.createJoint(
+          new pl.MouseJoint(md, groundBody, selectedBody, new Vec2(x, y))
+        );
+        mouseJointRef.current = mouseJoint;
+      }
+    });
+
+    canvas.addEventListener("mousemove", (e) => {
+      if (mouseJointRef.current) {
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / scale;
+        const y = (e.clientY - rect.top) / -scale;
+        mouseJointRef.current.setTarget(new Vec2(x, y));
+      }
+    });
+
+    canvas.addEventListener("mouseup", () => {
+      if (mouseJointRef.current) {
+        world.destroyJoint(mouseJointRef.current);
+        mouseJointRef.current = null;
+        selectedBodyRef.current = null;
+      }
+    });
   }, []);
 
   const handlePauseToggle = () => {
