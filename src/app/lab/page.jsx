@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import planck, { Vec2 } from "planck";
 import { render2 } from "../helpers/rendering";
 import { createWalls } from "../helpers/bodies";
@@ -252,32 +252,32 @@ function Lab() {
     }
   };
 
-  const createPolylineBox = (world, x, y) => {
-    const boxSize = 2; // Size of the box
+  const createPolylineBox = useCallback(
+    (world, x, y) => {
+      const boxSize = 2;
+      const vertices = [
+        new Vec2(-boxSize, -boxSize),
+        new Vec2(boxSize, -boxSize),
+        new Vec2(boxSize, boxSize),
+        new Vec2(-boxSize, boxSize),
+      ];
 
-    // Create vertices for a box
-    const vertices = [
-      new Vec2(-boxSize, -boxSize),
-      new Vec2(boxSize, -boxSize),
-      new Vec2(boxSize, boxSize),
-      new Vec2(-boxSize, boxSize),
-    ];
+      const body = world.createDynamicBody({
+        position: new Vec2(x, y),
+        angularDamping: 0.5,
+      });
 
-    const body = world.createDynamicBody({
-      position: new Vec2(x, y),
-      angularDamping: 0.5,
-    });
+      const polygonShape = pl.Polygon(vertices);
+      body.createFixture(polygonShape, {
+        density: 1.0,
+        friction: 0.3,
+        restitution: 0.2,
+      });
 
-    // Create a polygon shape instead of a chain
-    const polygonShape = pl.Polygon(vertices);
-    body.createFixture(polygonShape, {
-      density: 1.0,
-      friction: 0.3,
-      restitution: 0.2,
-    });
-
-    return body;
-  };
+      return body;
+    },
+    [pl]
+  );
 
   useEffect(() => {
     const canvas = canvasRef.current;
