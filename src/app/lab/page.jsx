@@ -21,7 +21,9 @@ function Lab() {
   const carRef = useRef(null);
   const mouseJointRef = useRef(null);
   const selectedBodyRef = useRef(null);
+  const [isBoxCreationMode, setIsBoxCreationMode] = useState(false);
 
+  const pl = planck;
   useEffect(() => {
     if (carRef && carVanish) {
       worldRef.current.destroyBody(carRef.current);
@@ -29,7 +31,6 @@ function Lab() {
   }, [carVanish]);
 
   useEffect(() => {
-    const pl = planck;
     const world = new pl.World(new Vec2(0, -10));
     worldRef.current = world;
 
@@ -251,15 +252,70 @@ function Lab() {
     }
   };
 
+  const createPolylineBox = (world, x, y) => {
+    const boxSize = 2; // Size of the box
+
+    // Create vertices for a box
+    const vertices = [
+      new Vec2(-boxSize, -boxSize),
+      new Vec2(boxSize, -boxSize),
+      new Vec2(boxSize, boxSize),
+      new Vec2(-boxSize, boxSize),
+    ];
+
+    const body = world.createDynamicBody({
+      position: new Vec2(x, y),
+      angularDamping: 0.5,
+    });
+
+    // Create a polygon shape instead of a chain
+    const polygonShape = pl.Polygon(vertices);
+    body.createFixture(polygonShape, {
+      density: 1.0,
+      friction: 0.3,
+      restitution: 0.2,
+    });
+
+    return body;
+  };
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const handleCanvasClick = (e) => {
+      if (!isBoxCreationMode || !worldRef.current) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / scale;
+      const y = (e.clientY - rect.top) / -scale;
+      createPolylineBox(worldRef.current, x, y);
+    };
+
+    canvas.addEventListener("click", handleCanvasClick);
+    return () => canvas.removeEventListener("click", handleCanvasClick);
+  }, [isBoxCreationMode, createPolylineBox]);
+
   return (
     <div>
       <Navbar />
-      <button
-        onClick={handlePauseToggle}
-        className="px-4 py-2 bg-blue-500 text-white rounded"
-      >
-        {isPaused ? "Play" : "Pause"}
-      </button>
+      <div className="flex gap-2">
+        <button
+          onClick={handlePauseToggle}
+          className="px-4 py-2 bg-blue-500 text-white rounded"
+        >
+          {isPaused ? "Play" : "Pause"}
+        </button>
+        <button
+          onClick={() => setIsBoxCreationMode(!isBoxCreationMode)}
+          className={`px-4 py-2 rounded ${
+            isBoxCreationMode
+              ? "bg-green-500 text-white"
+              : "bg-blue-500 text-white"
+          }`}
+        >
+          Create Box
+        </button>
+      </div>
 
       <div className="m-3 w-fit">
         X: {mousePos.x.toFixed(0)}, Y:{mousePos.y.toFixed(0)}
