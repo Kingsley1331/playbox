@@ -7,14 +7,12 @@ import Navbar from "../components/Navbar";
 import { mouseEvents } from "../helpers/utilities";
 
 function Lab() {
-  //   console.log("==============================================>Lab");
   const scale = 20;
   const canvasRef = useRef(null);
   const worldRef = useRef(null);
   const ctxRef = useRef(null);
   const isPausedRef = useRef(false); // Track pause state in ref
   const [isPaused, setIsPaused] = useState(true);
-  const [reset, setReset] = useState(false);
   const [carVanish, setCarVanish] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const carRef = useRef(null);
@@ -274,7 +272,7 @@ function Lab() {
       angularDamping: 0.5,
     });
 
-    const polygonShape = pl.Polygon(points);
+    const polygonShape = new pl.Polygon(points);
     body.createFixture(polygonShape, {
       density: 1.0,
       friction: 0.3,
@@ -345,6 +343,27 @@ function Lab() {
       canvas.removeEventListener("dblclick", handleDoubleClick);
     };
   }, [isPolylineMode, polylinePoints, createPolylineShape, isCircleMode]);
+
+  useEffect(() => {
+    const ctx = ctxRef.current;
+    if (!ctx || !polylinePoints.length) return;
+
+    ctx.save();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.beginPath();
+    ctx.scale(scale, -scale);
+    ctx.lineWidth = 0.5 / scale;
+
+    ctx.moveTo(polylinePoints[0].x, polylinePoints[0].y);
+    for (let i = 1; i < polylinePoints.length; i++) {
+      ctx.lineTo(polylinePoints[i].x, polylinePoints[i].y);
+    }
+    ctx.lineTo(mousePos.x, -mousePos.y);
+    ctx.strokeStyle = "black";
+    ctx.stroke();
+
+    ctx.restore();
+  }, [polylinePoints, mousePos]);
 
   return (
     <div>
