@@ -23,6 +23,7 @@ function Lab() {
   const selectedBodyRef = useRef(null);
   const [isBoxCreationMode, setIsBoxCreationMode] = useState(false);
   const [isPolylineMode, setIsPolylineMode] = useState(false);
+  const [isCircleMode, setIsCircleMode] = useState(false);
   const [polylinePoints, setPolylinePoints] = useState([]);
 
   const pl = planck;
@@ -256,7 +257,7 @@ function Lab() {
 
   const createPolylineBox = useCallback(
     (world, x, y) => {
-      const boxSize = 2;
+      const boxSize = 0.5;
       const vertices = [
         new Vec2(-boxSize, -boxSize),
         new Vec2(boxSize, -boxSize),
@@ -320,13 +321,25 @@ function Lab() {
     if (!canvas) return;
 
     const handleCanvasClick = (e) => {
-      if (!isPolylineMode) return;
+      if (!isPolylineMode && !isCircleMode) return;
 
       const rect = canvas.getBoundingClientRect();
       const x = (e.clientX - rect.left) / scale;
       const y = (e.clientY - rect.top) / -scale;
 
-      setPolylinePoints((prev) => [...prev, new Vec2(x, y)]);
+      if (isCircleMode) {
+        // create circle
+        const circle = worldRef.current.createDynamicBody({
+          position: new Vec2(x, y),
+        });
+        circle.createFixture(new pl.Circle(0.5), {
+          density: 1.0,
+          friction: 0.3,
+          restitution: 0.2,
+        });
+      } else {
+        setPolylinePoints((prev) => [...prev, new Vec2(x, y)]);
+      }
     };
 
     const handleDoubleClick = (e) => {
@@ -344,7 +357,7 @@ function Lab() {
       canvas.removeEventListener("click", handleCanvasClick);
       canvas.removeEventListener("dblclick", handleDoubleClick);
     };
-  }, [isPolylineMode, polylinePoints, createPolylineShape]);
+  }, [isPolylineMode, polylinePoints, createPolylineShape, isCircleMode]);
 
   return (
     <div>
@@ -365,6 +378,14 @@ function Lab() {
           }`}
         >
           Create Box
+        </button>
+        <button
+          onClick={() => setIsCircleMode(!isCircleMode)}
+          className={`px-4 py-2 rounded ${
+            isCircleMode ? "bg-green-500 text-white" : "bg-blue-500 text-white"
+          }`}
+        >
+          Create Circle
         </button>
         <button
           onClick={() => setIsPolylineMode(!isPolylineMode)}
