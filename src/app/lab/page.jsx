@@ -25,6 +25,7 @@ function Lab() {
   const [isPolylineMode, setIsPolylineMode] = useState(false);
   const [isCircleMode, setIsCircleMode] = useState(false);
   const [polylinePoints, setPolylinePoints] = useState([]);
+  const [fixtureList, setFixtureList] = useState([]);
 
   const pl = planck;
   useEffect(() => {
@@ -154,19 +155,6 @@ function Lab() {
       )
     );
 
-    render2(
-      worldRef,
-      ctxRef,
-      scale,
-      fps,
-      canvasRef,
-      {
-        x: 0,
-        y: 0,
-      },
-      isPausedRef
-    );
-
     // Detect collisions
     world.on("begin-contact", (contact) => {
       console.log("Collided with something");
@@ -237,10 +225,25 @@ function Lab() {
     });
   }, []);
 
+  useEffect(() => {
+    isPausedRef.current = true;
+    render2(
+      worldRef,
+      ctxRef,
+      scale,
+      fps,
+      canvasRef,
+      { x: 0, y: 0 },
+      isPausedRef
+    );
+  }, [fixtureList]);
+
   const handlePauseToggle = () => {
     isPausedRef.current = !isPausedRef.current;
 
     setIsPaused(!isPaused);
+    // fps = isPaused ? Infinity : 60;
+    setFps(isPaused ? Infinity : 60);
 
     if (!isPausedRef.current) {
       render2(
@@ -270,13 +273,13 @@ function Lab() {
         angularDamping: 0.5,
       });
 
-      const polygonShape = pl.Polygon(vertices);
+      const polygonShape = new pl.Polygon(vertices);
       body.createFixture(polygonShape, {
         density: 1.0,
         friction: 0.3,
         restitution: 0.2,
       });
-
+      setFixtureList((fixtureList) => [...fixtureList, body]);
       return body;
     },
     [pl]
@@ -337,6 +340,8 @@ function Lab() {
           friction: 0.3,
           restitution: 0.2,
         });
+
+        setFixtureList((fixtureList) => [...fixtureList, circle]);
       } else {
         setPolylinePoints((prev) => [...prev, new Vec2(x, y)]);
       }
@@ -345,7 +350,8 @@ function Lab() {
     const handleDoubleClick = (e) => {
       if (!isPolylineMode || polylinePoints.length < 3) return;
 
-      createPolylineShape(polylinePoints);
+      const polyline = createPolylineShape(polylinePoints);
+      setFixtureList((fixtureList) => [...fixtureList, polyline]);
       setPolylinePoints([]);
       setIsPolylineMode(false);
     };

@@ -9,8 +9,16 @@ export function render2(
   translation = { x: canvas.width / 2, y: canvas.height / 2 },
   isPausedRef
 ) {
+  console.log(
+    "==============================================>",
+    !!isPausedRef.current,
+    !!worldRef?.current,
+    !!ctxRef.current
+  );
   const canvas = canvasRef.current;
-  if (!isPausedRef.current && worldRef?.current && ctxRef.current) {
+  if (worldRef?.current && ctxRef.current) {
+    // if (!isPausedRef.current && worldRef?.current && ctxRef.current) {
+    console.log("==============================================>One");
     const world = worldRef.current;
     const ctx = ctxRef.current;
 
@@ -29,18 +37,19 @@ export function render2(
     }
 
     ctx.restore();
-
-    requestAnimationFrame(() =>
-      render2(
-        worldRef,
-        ctxRef,
-        scale,
-        fps,
-        canvasRef,
-        { x: translation.x, y: translation.y },
-        isPausedRef
-      )
-    );
+    if (!isPausedRef.current) {
+      requestAnimationFrame(() =>
+        render2(
+          worldRef,
+          ctxRef,
+          scale,
+          fps,
+          canvasRef,
+          { x: translation.x, y: translation.y },
+          isPausedRef
+        )
+      );
+    }
   }
 }
 
