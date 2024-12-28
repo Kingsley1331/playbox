@@ -22,6 +22,8 @@ function Lab() {
   const mouseJointRef = useRef(null);
   const selectedBodyRef = useRef(null);
   const [isBoxCreationMode, setIsBoxCreationMode] = useState(false);
+  const [isPolylineMode, setIsPolylineMode] = useState(false);
+  const [polylinePoints, setPolylinePoints] = useState([]);
 
   const pl = planck;
   useEffect(() => {
@@ -279,6 +281,24 @@ function Lab() {
     [pl]
   );
 
+  const createPolylineShape = useCallback((points) => {
+    if (!worldRef.current || points.length < 3) return;
+
+    const body = worldRef.current.createDynamicBody({
+      position: new Vec2(0, 0),
+      angularDamping: 0.5,
+    });
+
+    const polygonShape = pl.Polygon(points);
+    body.createFixture(polygonShape, {
+      density: 1.0,
+      friction: 0.3,
+      restitution: 0.2,
+    });
+
+    return body;
+  }, []);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -294,6 +314,37 @@ function Lab() {
     canvas.addEventListener("click", handleCanvasClick);
     return () => canvas.removeEventListener("click", handleCanvasClick);
   }, [isBoxCreationMode, createPolylineBox]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const handleCanvasClick = (e) => {
+      if (!isPolylineMode) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / scale;
+      const y = (e.clientY - rect.top) / -scale;
+
+      setPolylinePoints((prev) => [...prev, new Vec2(x, y)]);
+    };
+
+    const handleDoubleClick = (e) => {
+      if (!isPolylineMode || polylinePoints.length < 3) return;
+
+      createPolylineShape(polylinePoints);
+      setPolylinePoints([]);
+      setIsPolylineMode(false);
+    };
+
+    canvas.addEventListener("click", handleCanvasClick);
+    canvas.addEventListener("dblclick", handleDoubleClick);
+
+    return () => {
+      canvas.removeEventListener("click", handleCanvasClick);
+      canvas.removeEventListener("dblclick", handleDoubleClick);
+    };
+  }, [isPolylineMode, polylinePoints, createPolylineShape]);
 
   return (
     <div>
@@ -314,6 +365,18 @@ function Lab() {
           }`}
         >
           Create Box
+        </button>
+        <button
+          onClick={() => setIsPolylineMode(!isPolylineMode)}
+          className={`px-4 py-2 rounded ${
+            isPolylineMode
+              ? "bg-green-500 text-white"
+              : "bg-blue-500 text-white"
+          }`}
+        >
+          {isPolylineMode
+            ? `Creating Shape (${polylinePoints.length} points)`
+            : "Create Polyline Shape"}
         </button>
       </div>
 
