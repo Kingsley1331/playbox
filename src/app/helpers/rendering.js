@@ -21,8 +21,9 @@ export function render2(
     console.log("==============================================>One");
     const world = worldRef.current;
     const ctx = ctxRef.current;
+    const frameRate = isPausedRef.current ? Infinity : 60;
 
-    world?.step(1 / fps);
+    world?.step(1 / frameRate);
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     // Setup transform
@@ -38,6 +39,7 @@ export function render2(
 
     ctx.restore();
     if (!isPausedRef.current) {
+      console.log("==============================================>Two");
       requestAnimationFrame(() =>
         render2(
           worldRef,
