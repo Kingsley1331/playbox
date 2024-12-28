@@ -9,7 +9,6 @@ import { mouseEvents } from "../helpers/utilities";
 function Lab() {
   //   console.log("==============================================>Lab");
   const scale = 20;
-  const [fps, setFps] = useState(60);
   const canvasRef = useRef(null);
   const worldRef = useRef(null);
   const ctxRef = useRef(null);
@@ -227,34 +226,16 @@ function Lab() {
 
   useEffect(() => {
     isPausedRef.current = true;
-    render2(
-      worldRef,
-      ctxRef,
-      scale,
-      fps,
-      canvasRef,
-      { x: 0, y: 0 },
-      isPausedRef
-    );
+    render2(worldRef, ctxRef, scale, canvasRef, { x: 0, y: 0 }, isPausedRef);
   }, [fixtureList]);
 
   const handlePauseToggle = () => {
     isPausedRef.current = !isPausedRef.current;
 
     setIsPaused(!isPaused);
-    // fps = isPaused ? Infinity : 60;
-    setFps(isPaused ? Infinity : 60);
 
     if (!isPausedRef.current) {
-      render2(
-        worldRef,
-        ctxRef,
-        scale,
-        fps,
-        canvasRef,
-        { x: 0, y: 0 },
-        isPausedRef
-      );
+      render2(worldRef, ctxRef, scale, canvasRef, { x: 0, y: 0 }, isPausedRef);
     }
   };
 

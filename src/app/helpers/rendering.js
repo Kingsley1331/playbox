@@ -4,21 +4,12 @@ export function render2(
   worldRef,
   ctxRef,
   scale,
-  fps,
   canvasRef,
   translation = { x: canvas.width / 2, y: canvas.height / 2 },
   isPausedRef
 ) {
-  console.log(
-    "==============================================>",
-    !!isPausedRef.current,
-    !!worldRef?.current,
-    !!ctxRef.current
-  );
   const canvas = canvasRef.current;
   if (worldRef?.current && ctxRef.current) {
-    // if (!isPausedRef.current && worldRef?.current && ctxRef.current) {
-    console.log("==============================================>One");
     const world = worldRef.current;
     const ctx = ctxRef.current;
     const frameRate = isPausedRef.current ? Infinity : 60;
@@ -39,13 +30,11 @@ export function render2(
 
     ctx.restore();
     if (!isPausedRef.current) {
-      console.log("==============================================>Two");
       requestAnimationFrame(() =>
         render2(
           worldRef,
           ctxRef,
           scale,
-          fps,
           canvasRef,
           { x: translation.x, y: translation.y },
           isPausedRef
