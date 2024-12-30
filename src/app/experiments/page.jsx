@@ -77,6 +77,7 @@ function Lab() {
     const fixture3 = world
       .createBody(new Vec2(13, -20))
       .createFixture(new pl.Box(2, 2), 5.0);
+
     addFixture(fixture3);
 
     const canvas = canvasRef.current;
@@ -279,19 +280,21 @@ function Lab() {
   );
 
   const createPolylineShape = useCallback((points) => {
-    if (!worldRef.current || points.length < 3) return;
+    if (!world || points.length < 3) return;
 
-    const body = worldRef.current.createDynamicBody({
-      position: new Vec2(0, 0),
+    const body = world.createDynamicBody({
+      position: new Vec2(0, 0), // TODO: we need to set the position to the center of the polygon
       angularDamping: 0.5,
     });
 
     const polygonShape = new pl.Polygon(points);
+
     const fixture = body.createFixture(polygonShape, {
       density: 1.0,
       friction: 0.3,
       restitution: 0.2,
     });
+
     addFixture(fixture);
 
     return body;
@@ -344,8 +347,15 @@ function Lab() {
     };
 
     const handleDoubleClick = (e) => {
-      if (!isPolylineMode || polylinePoints.length < 3) return;
-
+      console.log(
+        "==========================================================>DOUBLE CLICK",
+        isPolylineMode,
+        Scene.polylinePoints.length
+      );
+      if (!isPolylineMode || Scene.polylinePoints < 3) return;
+      console.log(
+        "==========================================================>DOUBLE CLICK 2"
+      );
       const polyline = createPolylineShape(Scene.polylinePoints);
       setFixtureList((fixtureList) => [...fixtureList, polyline]);
       // setPolylinePoints([]);

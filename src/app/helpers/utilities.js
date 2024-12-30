@@ -1,4 +1,4 @@
-// set up event listeners on the canvas
+import { Scene } from "../experiments/World";
 export const mouseEvents = (canvas, scale, setMousePos) => {
   //   console.log("canvas", canvas);
   const mouse = {
@@ -13,7 +13,8 @@ export const mouseEvents = (canvas, scale, setMousePos) => {
     // console.log("rect", rect);
     mouse.x = (e.clientX - rect.left) / scale;
     mouse.y = (e.clientY - rect.top) / scale;
-    setMousePos({ x: mouse.x, y: mouse.y });
+    // setMousePos({ x: mouse.x, y: mouse.y });
+    Scene.mousePos = { x: mouse.x, y: mouse.y };
   };
 
   const mouseDown = (e) => {

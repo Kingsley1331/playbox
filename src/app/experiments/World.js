@@ -12,6 +12,7 @@ Scene.world = world;
 // Scene.translation = { x: 0, y: 0 };
 // Scene.isPaused = true;
 Scene.polylinePoints = [];
+Scene.mousePos = { x: 0, y: 0 };
 
 export function addFixture(fixture) {
   Scene.fixtures.push(fixture);
