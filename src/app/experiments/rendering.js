@@ -22,8 +22,7 @@ export function render2(
     // Setup transform
     ctx.save();
     ctx.translate(translation.x, translation.y);
-    ctx.scale(1, -1);
-    ctx.scale(scale, scale);
+    ctx.scale(scale, -scale);
 
     // Draw all bodies
     for (let b = world?.getBodyList(); b; b = b.getNext()) {
@@ -38,12 +37,11 @@ export function render2(
       ctx.save();
       // Apply the same transforms as the main drawing
       ctx.translate(translation.x, translation.y);
-      ctx.scale(1, -1);
-      ctx.scale(scale, scale);
+      ctx.scale(scale, -scale);
 
       // Make the line more visible for debugging
       ctx.strokeStyle = "black";
-      ctx.lineWidth = 0.3 / scale;
+      ctx.lineWidth = 1 / scale;
 
       // Draw first point with a distinct circle
       ctx.beginPath();

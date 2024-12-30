@@ -239,7 +239,7 @@ function Lab() {
     isPausedRef.current = true;
     render2(world, ctxRef, scale, canvasRef, { x: 0, y: 0 }, isPausedRef);
     // render2(worldRef, ctxRef, scale, canvasRef, { x: 0, y: 0 }, isPausedRef);
-  }, [fixtureList]);
+  }, [fixtureList, world]);
 
   const handlePauseToggle = () => {
     isPausedRef.current = !isPausedRef.current;
