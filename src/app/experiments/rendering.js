@@ -62,18 +62,18 @@ export function render2(
       ctx.restore();
     }
 
-    // if (!isPausedRef.current) {
-    requestAnimationFrame(() =>
-      render2(
-        world,
-        ctxRef,
-        scale,
-        canvasRef,
-        { x: translation.x, y: translation.y },
-        isPausedRef
-      )
-    );
-    // }
+    if (!isPausedRef.current || Scene.isPolylines) {
+      requestAnimationFrame(() =>
+        render2(
+          world,
+          ctxRef,
+          scale,
+          canvasRef,
+          { x: translation.x, y: translation.y },
+          isPausedRef
+        )
+      );
+    }
   }
 }
 

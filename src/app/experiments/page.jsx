@@ -364,6 +364,7 @@ function Lab() {
       // setPolylinePoints([]);
       Scene.polylinePoints = [];
       setIsPolylineMode(false);
+      Scene.isPolylines = false;
     };
 
     canvas.addEventListener("click", handleCanvasClick);
@@ -425,7 +426,10 @@ function Lab() {
           Create Circle
         </button>
         <button
-          onClick={() => setIsPolylineMode(!isPolylineMode)}
+          onClick={() => {
+            setIsPolylineMode(!isPolylineMode);
+            Scene.isPolylines = !isPolylineMode;
+          }}
           className={`px-4 py-2 rounded ${
             isPolylineMode
               ? "bg-green-500 text-white"
