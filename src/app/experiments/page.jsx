@@ -429,6 +429,14 @@ function Lab() {
           onClick={() => {
             setIsPolylineMode(!isPolylineMode);
             Scene.isPolylines = !isPolylineMode;
+            render2(
+              world,
+              ctxRef,
+              scale,
+              canvasRef,
+              { x: 0, y: 0 },
+              isPausedRef
+            );
           }}
           className={`px-4 py-2 rounded ${
             isPolylineMode
