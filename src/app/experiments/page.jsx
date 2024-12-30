@@ -338,16 +338,18 @@ function Lab() {
 
         setFixtureList((fixtureList) => [...fixtureList, circle]);
       } else {
-        setPolylinePoints((prev) => [...prev, new Vec2(x, y)]);
+        // setPolylinePoints((prev) => [...prev, new Vec2(x, y)]);
+        Scene.polylinePoints = [...Scene.polylinePoints, new Vec2(x, y)];
       }
     };
 
     const handleDoubleClick = (e) => {
       if (!isPolylineMode || polylinePoints.length < 3) return;
 
-      const polyline = createPolylineShape(polylinePoints);
+      const polyline = createPolylineShape(Scene.polylinePoints);
       setFixtureList((fixtureList) => [...fixtureList, polyline]);
-      setPolylinePoints([]);
+      // setPolylinePoints([]);
+      Scene.polylinePoints = [];
       setIsPolylineMode(false);
     };
 

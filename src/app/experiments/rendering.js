@@ -10,6 +10,9 @@ export function render2(
   isPausedRef
 ) {
   const canvas = canvasRef.current;
+  console.log(
+    "==========================================================>RUNNING"
+  );
   if (world && ctxRef.current) {
     // const world = worldRef.current;
     const ctx = ctxRef.current;
@@ -29,19 +32,77 @@ export function render2(
       drawBody(ctx, b, scale);
     }
 
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 1 / scale;
+    ctx.beginPath();
+    ctx.moveTo(50, -20); // Removed scale multiplication since we already scaled the context
+    ctx.lineTo(70, -20);
+    ctx.lineTo(70, -40);
+    ctx.stroke();
     ctx.restore();
-    if (!isPausedRef.current) {
-      requestAnimationFrame(() =>
-        render2(
-          world,
-          ctxRef,
-          scale,
-          canvasRef,
-          { x: translation.x, y: translation.y },
-          isPausedRef
-        )
+
+    if (Scene.polylinePoints.length > 0) {
+      console.log("Number of points:", Scene.polylinePoints.length);
+
+      ctx.save();
+      // Apply the same transforms as the main drawing
+      ctx.translate(translation.x, translation.y);
+      ctx.scale(1, -1);
+      ctx.scale(scale, scale);
+
+      // Make the line more visible for debugging
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 0.3 / scale;
+
+      // Draw first point with a distinct circle
+      ctx.beginPath();
+      console.log("First point:", Scene.polylinePoints[0]);
+      ctx.moveTo(Scene.polylinePoints[0].x, Scene.polylinePoints[0].y);
+      ctx.arc(
+        Scene.polylinePoints[0].x,
+        Scene.polylinePoints[0].y,
+        5 / scale,
+        0,
+        Math.PI * 2
       );
+
+      // Start a new path for the line
+      ctx.beginPath();
+      ctx.moveTo(Scene.polylinePoints[0].x, Scene.polylinePoints[0].y);
+
+      for (let i = 0; i < Scene.polylinePoints.length; i++) {
+        console.log(`Point ${i}:`, Scene.polylinePoints[i]);
+        ctx.lineTo(Scene.polylinePoints[i].x, Scene.polylinePoints[i].y);
+
+        // Draw a small circle at each point for debugging
+        // ctx.fillStyle = "blue";
+        // ctx.beginPath();
+        ctx.arc(
+          Scene.polylinePoints[i].x,
+          Scene.polylinePoints[i].y,
+          5 / scale,
+          0,
+          Math.PI * 2
+        );
+        // ctx.fill();
+        // ctx.stroke();
+      }
+      ctx.stroke();
+      ctx.restore();
     }
+
+    // if (!isPausedRef.current) {
+    requestAnimationFrame(() =>
+      render2(
+        world,
+        ctxRef,
+        scale,
+        canvasRef,
+        { x: translation.x, y: translation.y },
+        isPausedRef
+      )
+    );
+    // }
   }
 }
 
