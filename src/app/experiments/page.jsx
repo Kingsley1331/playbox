@@ -253,6 +253,9 @@ function Lab() {
 
   const createPolylineBox = useCallback(
     (world, x, y) => {
+      console.log(
+        "==========================================================>CREATE POLYLINE BOX"
+      );
       const boxSize = 0.5;
       const vertices = [
         new Vec2(-boxSize, -boxSize),
@@ -305,16 +308,16 @@ function Lab() {
     if (!canvas) return;
 
     const handleCanvasClick = (e) => {
-      if (!isBoxCreationMode || !worldRef.current) return;
+      if (!isBoxCreationMode || !world) return;
       const rect = canvas.getBoundingClientRect();
       const x = (e.clientX - rect.left) / scale;
       const y = (e.clientY - rect.top) / -scale;
-      createPolylineBox(worldRef.current, x, y);
+      createPolylineBox(world, x, y);
     };
 
     canvas.addEventListener("click", handleCanvasClick);
     return () => canvas.removeEventListener("click", handleCanvasClick);
-  }, [isBoxCreationMode, createPolylineBox]);
+  }, [isBoxCreationMode, createPolylineBox, world]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -329,7 +332,7 @@ function Lab() {
 
       if (isCircleMode) {
         // create circle
-        const circle = worldRef.current.createDynamicBody({
+        const circle = world.createDynamicBody({
           position: new Vec2(x, y),
         });
         const fixture = circle.createFixture(new pl.Circle(0.5), {
