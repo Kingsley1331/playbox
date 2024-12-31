@@ -62,7 +62,8 @@ export function render2(
       ctx.restore();
     }
 
-    if (!isPausedRef.current || Scene.isPolylines) {
+    if (!isPausedRef.current || Scene.mode === "polyline") {
+      // if (!isPausedRef.current || Scene.isPolylines) {
       requestAnimationFrame(() =>
         render2(
           world,

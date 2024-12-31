@@ -401,7 +401,8 @@ function Lab() {
       // setPolylinePoints([]);
       Scene.polylinePoints = [];
       setIsPolylineMode(false);
-      Scene.isPolylines = false;
+      UpdateMode("");
+      // Scene.isPolylines = false;
     };
 
     canvas.addEventListener("click", handleCanvasClick);
@@ -477,8 +478,8 @@ function Lab() {
         </button>
         <button
           onClick={() => {
-            // setIsPolylineMode(!isPolylineMode);
-            Scene.isPolylines = !isPolylineMode;
+            setIsPolylineMode(!isPolylineMode);
+            // Scene.isPolylines = !isPolylineMode;
 
             UpdateMode("polyline");
             render2(
@@ -497,7 +498,7 @@ function Lab() {
           }`}
         >
           {isPolylineMode
-            ? `Creating Shape (${Scene.polylinePoints.length} points)`
+            ? `Creating Shape (${isPolylineMode} points)`
             : "Create Polyline Shape"}
         </button>
       </div>
