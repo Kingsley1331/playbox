@@ -28,15 +28,25 @@ function Lab() {
 
   // TODO: turn into custom hook
   const UpdateMode = useCallback((mode) => {
+    console.log(
+      "=======================================Scene.mode",
+      Scene.mode
+    );
     setIsPolylineMode(false);
     setIsCircleMode(false);
     setIsBoxCreationMode(false);
     setIsPaused(false);
-    // isPausedRef.current = false;
     if (mode === Scene.mode) {
+      console.log(
+        "=======================================mode",
+        mode,
+        Scene.mode
+      );
       Scene.mode = "";
       return;
     }
+
+    // isPausedRef.current = false;
 
     setMode(mode);
     if (mode === "polyline") {
@@ -44,6 +54,7 @@ function Lab() {
     } else if (mode === "circle") {
       setIsCircleMode(true);
     } else if (mode === "box") {
+      console.log("=======================================box");
       setIsBoxCreationMode(true);
     }
     // } else if (mode === "pause") {
@@ -376,15 +387,15 @@ function Lab() {
     };
 
     const handleDoubleClick = (e) => {
-      console.log(
-        "==========================================================>DOUBLE CLICK",
-        isPolylineMode,
-        Scene.polylinePoints.length
-      );
+      // console.log(
+      //   "==========================================================>DOUBLE CLICK",
+      //   isPolylineMode,
+      //   Scene.polylinePoints.length
+      // );
       if (!isPolylineMode || Scene.polylinePoints < 3) return;
-      console.log(
-        "==========================================================>DOUBLE CLICK 2"
-      );
+      // console.log(
+      //   "==========================================================>DOUBLE CLICK 2"
+      // );
       const polyline = createPolylineShape(Scene.polylinePoints);
       setFixtureList((fixtureList) => [...fixtureList, polyline]);
       // setPolylinePoints([]);
@@ -400,11 +411,11 @@ function Lab() {
       canvas.removeEventListener("click", handleCanvasClick);
       canvas.removeEventListener("dblclick", handleDoubleClick);
     };
-  }, [isPolylineMode, polylinePoints, createPolylineShape, isCircleMode]);
+  }, [isPolylineMode, createPolylineShape, isCircleMode]);
 
   useEffect(() => {
     const ctx = ctxRef.current;
-    if (!ctx || !polylinePoints.length) return;
+    if (!ctx || !Scene.polylinePoints.length) return;
 
     ctx.save();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -412,16 +423,16 @@ function Lab() {
     ctx.scale(scale, -scale);
     ctx.lineWidth = 0.5 / scale;
 
-    ctx.moveTo(polylinePoints[0].x, polylinePoints[0].y);
-    for (let i = 1; i < polylinePoints.length; i++) {
-      ctx.lineTo(polylinePoints[i].x, polylinePoints[i].y);
+    ctx.moveTo(Scene.polylinePoints[0].x, Scene.polylinePoints[0].y);
+    for (let i = 1; i < Scene.polylinePoints.length; i++) {
+      ctx.lineTo(Scene.polylinePoints[i].x, Scene.polylinePoints[i].y);
     }
     ctx.lineTo(mousePos.x, -mousePos.y);
     ctx.strokeStyle = "black";
     ctx.stroke();
 
     ctx.restore();
-  }, [polylinePoints, mousePos]);
+  }, [mousePos]);
 
   return (
     <div>
@@ -432,9 +443,11 @@ function Lab() {
             handlePauseToggle();
             UpdateMode("pause");
           }}
-          className={`px-4 py-2 rounded ${(Scene.mode = "paused"
-            ? "bg-blue-500 text-white"
-            : "bg-green-500 text-white")}`}
+          className={`px-4 py-2 rounded ${
+            Scene.mode === "paused"
+              ? "bg-blue-500 text-white"
+              : "bg-green-500 text-white"
+          }`}
         >
           {isPaused ? "Play" : "Pause"}
         </button>
@@ -466,6 +479,8 @@ function Lab() {
           onClick={() => {
             // setIsPolylineMode(!isPolylineMode);
             Scene.isPolylines = !isPolylineMode;
+
+            UpdateMode("polyline");
             render2(
               world,
               ctxRef,
@@ -474,7 +489,6 @@ function Lab() {
               { x: 0, y: 0 },
               isPausedRef
             );
-            UpdateMode("polyline");
           }}
           className={`px-4 py-2 rounded ${
             isPolylineMode
@@ -483,7 +497,7 @@ function Lab() {
           }`}
         >
           {isPolylineMode
-            ? `Creating Shape (${polylinePoints.length} points)`
+            ? `Creating Shape (${Scene.polylinePoints.length} points)`
             : "Create Polyline Shape"}
         </button>
       </div>
