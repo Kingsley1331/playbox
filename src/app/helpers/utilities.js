@@ -33,3 +33,7 @@ export const mouseEvents = (canvas, scale, setMousePos) => {
 
   return mouse;
 };
+
+export const setMode = (mode) => {
+  Scene.mode = mode;
+};

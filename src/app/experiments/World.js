@@ -14,6 +14,7 @@ Scene.world = world;
 Scene.polylinePoints = [];
 Scene.mousePos = { x: 0, y: 0 };
 Scene.isPolylines = false;
+Scene.mode = "";
 
 export function addFixture(fixture) {
   Scene.fixtures.push(fixture);

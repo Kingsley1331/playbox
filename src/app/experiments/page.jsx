@@ -7,11 +7,11 @@ import Navbar from "../components/Navbar";
 import { mouseEvents } from "../helpers/utilities";
 import { Scene } from "./World";
 import { addFixture } from "./World";
+import { setMode } from "../helpers/utilities";
 
 function Lab() {
   const scale = 20;
   const canvasRef = useRef(null);
-  const worldRef = useRef(null);
   const ctxRef = useRef(null);
   const isPausedRef = useRef(false); // Track pause state in ref
   const [isPaused, setIsPaused] = useState(true);
@@ -25,6 +25,32 @@ function Lab() {
   const [isCircleMode, setIsCircleMode] = useState(false);
   const [polylinePoints, setPolylinePoints] = useState([]);
   const [fixtureList, setFixtureList] = useState([]);
+
+  // TODO: turn into custom hook
+  const UpdateMode = useCallback((mode) => {
+    setIsPolylineMode(false);
+    setIsCircleMode(false);
+    setIsBoxCreationMode(false);
+    setIsPaused(false);
+    // isPausedRef.current = false;
+    if (mode === Scene.mode) {
+      Scene.mode = "";
+      return;
+    }
+
+    setMode(mode);
+    if (mode === "polyline") {
+      setIsPolylineMode(true);
+    } else if (mode === "circle") {
+      setIsCircleMode(true);
+    } else if (mode === "box") {
+      setIsBoxCreationMode(true);
+    }
+    // } else if (mode === "pause") {
+    //   setIsPaused(true);
+    //   isPausedRef.current = true;
+    // }
+  }, []);
 
   const world = Scene.world;
 
@@ -402,13 +428,21 @@ function Lab() {
       <Navbar />
       <div className="flex gap-2">
         <button
-          onClick={handlePauseToggle}
-          className="px-4 py-2 bg-blue-500 text-white rounded"
+          onClick={() => {
+            handlePauseToggle();
+            UpdateMode("pause");
+          }}
+          className={`px-4 py-2 rounded ${(Scene.mode = "paused"
+            ? "bg-blue-500 text-white"
+            : "bg-green-500 text-white")}`}
         >
           {isPaused ? "Play" : "Pause"}
         </button>
         <button
-          onClick={() => setIsBoxCreationMode(!isBoxCreationMode)}
+          onClick={() => {
+            // setIsBoxCreationMode(!isBoxCreationMode);
+            UpdateMode("box");
+          }}
           className={`px-4 py-2 rounded ${
             isBoxCreationMode
               ? "bg-green-500 text-white"
@@ -418,7 +452,10 @@ function Lab() {
           Create Box
         </button>
         <button
-          onClick={() => setIsCircleMode(!isCircleMode)}
+          onClick={() => {
+            // setIsCircleMode(!isCircleMode);
+            UpdateMode("circle");
+          }}
           className={`px-4 py-2 rounded ${
             isCircleMode ? "bg-green-500 text-white" : "bg-blue-500 text-white"
           }`}
@@ -427,7 +464,7 @@ function Lab() {
         </button>
         <button
           onClick={() => {
-            setIsPolylineMode(!isPolylineMode);
+            // setIsPolylineMode(!isPolylineMode);
             Scene.isPolylines = !isPolylineMode;
             render2(
               world,
@@ -437,6 +474,7 @@ function Lab() {
               { x: 0, y: 0 },
               isPausedRef
             );
+            UpdateMode("polyline");
           }}
           className={`px-4 py-2 rounded ${
             isPolylineMode
