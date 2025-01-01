@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import planck, { Vec2 } from "planck";
-import { render2 } from "./rendering";
+import { render } from "./rendering";
 import { createWalls } from "../helpers/bodies";
 import Navbar from "../components/Navbar";
 import { mouseEvents } from "../helpers/utilities";
@@ -259,7 +259,7 @@ function Lab() {
 
   useEffect(() => {
     isPausedRef.current = true;
-    render2(world, ctxRef, canvasRef, { x: 0, y: 0 }, isPausedRef);
+    render(world, ctxRef, canvasRef, { x: 0, y: 0 }, isPausedRef);
   }, [fixtureList, world]);
 
   const handlePauseToggle = () => {
@@ -268,7 +268,7 @@ function Lab() {
     setIsPaused(!isPaused);
 
     if (!isPausedRef.current) {
-      render2(world, ctxRef, canvasRef, { x: 0, y: 0 }, isPausedRef);
+      render(world, ctxRef, canvasRef, { x: 0, y: 0 }, isPausedRef);
     }
   };
 
@@ -451,7 +451,7 @@ function Lab() {
           onClick={() => {
             setIsPolylineMode(!isPolylineMode);
             UpdateMode("polyline");
-            render2(world, ctxRef, canvasRef, { x: 0, y: 0 }, isPausedRef);
+            render(world, ctxRef, canvasRef, { x: 0, y: 0 }, isPausedRef);
           }}
           className={`px-4 py-2 rounded ${
             isPolylineMode

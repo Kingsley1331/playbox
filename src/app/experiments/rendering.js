@@ -4,7 +4,7 @@ import { Scene } from "./World";
 const { scale } = Scene;
 
 console.log("rendering123");
-export function render2(
+export function render(
   world,
   ctxRef,
   canvasRef,
@@ -63,7 +63,7 @@ export function render2(
 
     if (!isPausedRef.current || Scene.mode === "polyline") {
       requestAnimationFrame(() =>
-        render2(
+        render(
           world,
           ctxRef,
           canvasRef,
