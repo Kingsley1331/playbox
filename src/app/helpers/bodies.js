@@ -1,6 +1,9 @@
 import planck, { Vec2 } from "planck";
+import { Scene } from "../experiments/World";
 
-export const createWalls = (world, canvas, scale) => {
+const { scale } = Scene;
+
+export const createWalls = (world, canvas) => {
   const groundHeight = -canvas?.height / scale;
   const canvasWidth = canvas?.width / scale;
   const canvasHeight = canvas?.height / scale;

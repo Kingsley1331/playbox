@@ -88,7 +88,7 @@ function Lab() {
         type: "dynamic",
         position: new Vec2(
           stackX,
-          boxSize / 2 + i * (boxSize * 2) - 1200 / scale
+          boxSize / 2 + i * (boxSize * 2) - 1200 / Scene.scale
         ),
       });
       const fixture = box.createFixture(new pl.Box(boxSize, boxSize), {
@@ -121,10 +121,10 @@ function Lab() {
     const ctx = canvas?.getContext("2d");
     ctxRef.current = ctx;
 
-    const mouse = mouseEvents(canvas, scale, setMousePos);
+    const mouse = mouseEvents(canvas, setMousePos);
     console.log("mouse", mouse);
 
-    createWalls(world, canvas, scale);
+    createWalls(world, canvas);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -228,8 +228,8 @@ function Lab() {
 
     canvas.addEventListener("mousedown", (e) => {
       const rect = canvas.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / scale;
-      const y = (e.clientY - rect.top) / -scale;
+      const x = (e.clientX - rect.left) / Scene.scale;
+      const y = (e.clientY - rect.top) / -Scene.scale;
 
       const aabb = new pl.AABB(
         new Vec2(x - 0.01, y - 0.01),
@@ -257,8 +257,8 @@ function Lab() {
     canvas.addEventListener("mousemove", (e) => {
       if (mouseJointRef.current) {
         const rect = canvas.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / scale;
-        const y = (e.clientY - rect.top) / -scale;
+        const x = (e.clientX - rect.left) / Scene.scale;
+        const y = (e.clientY - rect.top) / -Scene.scale;
         mouseJointRef.current.setTarget(new Vec2(x, y));
       }
     });
@@ -274,7 +274,7 @@ function Lab() {
 
   useEffect(() => {
     isPausedRef.current = true;
-    render2(world, ctxRef, scale, canvasRef, { x: 0, y: 0 }, isPausedRef);
+    render2(world, ctxRef, canvasRef, { x: 0, y: 0 }, isPausedRef);
     // render2(worldRef, ctxRef, scale, canvasRef, { x: 0, y: 0 }, isPausedRef);
   }, [fixtureList, world]);
 
@@ -284,7 +284,7 @@ function Lab() {
     setIsPaused(!isPaused);
 
     if (!isPausedRef.current) {
-      render2(world, ctxRef, scale, canvasRef, { x: 0, y: 0 }, isPausedRef);
+      render2(world, ctxRef, canvasRef, { x: 0, y: 0 }, isPausedRef);
     }
   };
 
@@ -347,8 +347,8 @@ function Lab() {
     const handleCanvasClick = (e) => {
       if (!isBoxCreationMode || !world) return;
       const rect = canvas.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / scale;
-      const y = (e.clientY - rect.top) / -scale;
+      const x = (e.clientX - rect.left) / Scene.scale;
+      const y = (e.clientY - rect.top) / -Scene.scale;
       createPolylineBox(world, x, y);
     };
 
@@ -364,8 +364,8 @@ function Lab() {
       if (!isPolylineMode && !isCircleMode) return;
 
       const rect = canvas.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / scale;
-      const y = (e.clientY - rect.top) / -scale;
+      const x = (e.clientX - rect.left) / Scene.scale;
+      const y = (e.clientY - rect.top) / -Scene.scale;
 
       if (isCircleMode) {
         // create circle
@@ -421,8 +421,8 @@ function Lab() {
     ctx.save();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.beginPath();
-    ctx.scale(scale, -scale);
-    ctx.lineWidth = 0.5 / scale;
+    ctx.scale(Scene.scale, -Scene.scale);
+    ctx.lineWidth = 0.5 / Scene.scale;
 
     ctx.moveTo(Scene.polylinePoints[0].x, Scene.polylinePoints[0].y);
     for (let i = 1; i < Scene.polylinePoints.length; i++) {
@@ -482,14 +482,7 @@ function Lab() {
             // Scene.isPolylines = !isPolylineMode;
 
             UpdateMode("polyline");
-            render2(
-              world,
-              ctxRef,
-              scale,
-              canvasRef,
-              { x: 0, y: 0 },
-              isPausedRef
-            );
+            render2(world, ctxRef, canvasRef, { x: 0, y: 0 }, isPausedRef);
           }}
           className={`px-4 py-2 rounded ${
             isPolylineMode

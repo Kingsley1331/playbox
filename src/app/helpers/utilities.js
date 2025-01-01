@@ -1,5 +1,8 @@
 import { Scene } from "../experiments/World";
-export const mouseEvents = (canvas, scale, setMousePos) => {
+
+const { scale } = Scene;
+
+export const mouseEvents = (canvas, setMousePos) => {
   //   console.log("canvas", canvas);
   const mouse = {
     x: 0,

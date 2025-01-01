@@ -8,7 +8,7 @@ const world = new planck.World(new Vec2(0, -10));
 
 Scene.fixtures = fixtures;
 Scene.world = world;
-// Scene.scale = 20;
+Scene.scale = 20;
 // Scene.translation = { x: 0, y: 0 };
 // Scene.isPaused = true;
 Scene.polylinePoints = [];

@@ -1,10 +1,12 @@
 "use client";
 import { Scene } from "./World";
+
+const { scale } = Scene;
+
 console.log("rendering123");
 export function render2(
   world,
   ctxRef,
-  scale,
   canvasRef,
   translation = { x: canvas.width / 2, y: canvas.height / 2 },
   isPausedRef
@@ -26,7 +28,7 @@ export function render2(
 
     // Draw all bodies
     for (let b = world?.getBodyList(); b; b = b.getNext()) {
-      drawBody(ctx, b, scale);
+      drawBody(ctx, b);
     }
 
     ctx.restore();
@@ -68,7 +70,6 @@ export function render2(
         render2(
           world,
           ctxRef,
-          scale,
           canvasRef,
           { x: translation.x, y: translation.y },
           isPausedRef
@@ -78,7 +79,7 @@ export function render2(
   }
 }
 
-export function drawBody(ctx, body, scale) {
+export function drawBody(ctx, body) {
   // console.log("Scene.fixtures", Scene.fixtures);
   const colour = "rgb(175, 224, 230, 0.8)";
   // console.log("Scene.fixtures[0]", Scene.fixtures[0]);
