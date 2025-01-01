@@ -9,8 +9,9 @@ import { Scene } from "./World";
 import { addFixture } from "./World";
 import { setMode } from "../helpers/utilities";
 
+const { scale } = Scene;
+
 function Lab() {
-  const scale = 20;
   const canvasRef = useRef(null);
   const ctxRef = useRef(null);
   const isPausedRef = useRef(false); // Track pause state in ref
@@ -23,7 +24,6 @@ function Lab() {
   const [isBoxCreationMode, setIsBoxCreationMode] = useState(false);
   const [isPolylineMode, setIsPolylineMode] = useState(false);
   const [isCircleMode, setIsCircleMode] = useState(false);
-  const [polylinePoints, setPolylinePoints] = useState([]);
   const [fixtureList, setFixtureList] = useState([]);
 
   // TODO: turn into custom hook
@@ -37,16 +37,9 @@ function Lab() {
     setIsBoxCreationMode(false);
     setIsPaused(false);
     if (mode === Scene.mode) {
-      console.log(
-        "=======================================mode",
-        mode,
-        Scene.mode
-      );
       Scene.mode = "";
       return;
     }
-
-    // isPausedRef.current = false;
 
     setMode(mode);
     if (mode === "polyline") {
@@ -54,13 +47,8 @@ function Lab() {
     } else if (mode === "circle") {
       setIsCircleMode(true);
     } else if (mode === "box") {
-      console.log("=======================================box");
       setIsBoxCreationMode(true);
     }
-    // } else if (mode === "pause") {
-    //   setIsPaused(true);
-    //   isPausedRef.current = true;
-    // }
   }, []);
 
   const world = Scene.world;
@@ -73,9 +61,6 @@ function Lab() {
   // }, [carVanish]);
 
   useEffect(() => {
-    // const world = new pl.World(new Vec2(0, -10));
-    // worldRef.current = world;
-
     // Add a ground body for the mouse joint
     const groundBody = world.createBody();
 
@@ -88,7 +73,7 @@ function Lab() {
         type: "dynamic",
         position: new Vec2(
           stackX,
-          boxSize / 2 + i * (boxSize * 2) - 1200 / Scene.scale
+          boxSize / 2 + i * (boxSize * 2) - 1200 / scale
         ),
       });
       const fixture = box.createFixture(new pl.Box(boxSize, boxSize), {
@@ -228,8 +213,8 @@ function Lab() {
 
     canvas.addEventListener("mousedown", (e) => {
       const rect = canvas.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / Scene.scale;
-      const y = (e.clientY - rect.top) / -Scene.scale;
+      const x = (e.clientX - rect.left) / scale;
+      const y = (e.clientY - rect.top) / -scale;
 
       const aabb = new pl.AABB(
         new Vec2(x - 0.01, y - 0.01),
@@ -257,8 +242,8 @@ function Lab() {
     canvas.addEventListener("mousemove", (e) => {
       if (mouseJointRef.current) {
         const rect = canvas.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / Scene.scale;
-        const y = (e.clientY - rect.top) / -Scene.scale;
+        const x = (e.clientX - rect.left) / scale;
+        const y = (e.clientY - rect.top) / -scale;
         mouseJointRef.current.setTarget(new Vec2(x, y));
       }
     });
@@ -275,7 +260,6 @@ function Lab() {
   useEffect(() => {
     isPausedRef.current = true;
     render2(world, ctxRef, canvasRef, { x: 0, y: 0 }, isPausedRef);
-    // render2(worldRef, ctxRef, scale, canvasRef, { x: 0, y: 0 }, isPausedRef);
   }, [fixtureList, world]);
 
   const handlePauseToggle = () => {
@@ -290,9 +274,6 @@ function Lab() {
 
   const createPolylineBox = useCallback(
     (world, x, y) => {
-      console.log(
-        "==========================================================>CREATE POLYLINE BOX"
-      );
       const boxSize = 0.5;
       const vertices = [
         new Vec2(-boxSize, -boxSize),
@@ -347,8 +328,8 @@ function Lab() {
     const handleCanvasClick = (e) => {
       if (!isBoxCreationMode || !world) return;
       const rect = canvas.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / Scene.scale;
-      const y = (e.clientY - rect.top) / -Scene.scale;
+      const x = (e.clientX - rect.left) / scale;
+      const y = (e.clientY - rect.top) / -scale;
       createPolylineBox(world, x, y);
     };
 
@@ -364,8 +345,8 @@ function Lab() {
       if (!isPolylineMode && !isCircleMode) return;
 
       const rect = canvas.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / Scene.scale;
-      const y = (e.clientY - rect.top) / -Scene.scale;
+      const x = (e.clientX - rect.left) / scale;
+      const y = (e.clientY - rect.top) / -scale;
 
       if (isCircleMode) {
         // create circle
@@ -387,22 +368,14 @@ function Lab() {
     };
 
     const handleDoubleClick = (e) => {
-      // console.log(
-      //   "==========================================================>DOUBLE CLICK",
-      //   isPolylineMode,
-      //   Scene.polylinePoints.length
-      // );
       if (!isPolylineMode || Scene.polylinePoints < 3) return;
-      // console.log(
-      //   "==========================================================>DOUBLE CLICK 2"
-      // );
+
       const polyline = createPolylineShape(Scene.polylinePoints);
       setFixtureList((fixtureList) => [...fixtureList, polyline]);
       // setPolylinePoints([]);
       Scene.polylinePoints = [];
       setIsPolylineMode(false);
       UpdateMode("");
-      // Scene.isPolylines = false;
     };
 
     canvas.addEventListener("click", handleCanvasClick);
@@ -421,8 +394,8 @@ function Lab() {
     ctx.save();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.beginPath();
-    ctx.scale(Scene.scale, -Scene.scale);
-    ctx.lineWidth = 0.5 / Scene.scale;
+    ctx.scale(scale, -scale);
+    ctx.lineWidth = 0.5 / scale;
 
     ctx.moveTo(Scene.polylinePoints[0].x, Scene.polylinePoints[0].y);
     for (let i = 1; i < Scene.polylinePoints.length; i++) {
@@ -454,7 +427,6 @@ function Lab() {
         </button>
         <button
           onClick={() => {
-            // setIsBoxCreationMode(!isBoxCreationMode);
             UpdateMode("box");
           }}
           className={`px-4 py-2 rounded ${
@@ -467,7 +439,6 @@ function Lab() {
         </button>
         <button
           onClick={() => {
-            // setIsCircleMode(!isCircleMode);
             UpdateMode("circle");
           }}
           className={`px-4 py-2 rounded ${
@@ -479,8 +450,6 @@ function Lab() {
         <button
           onClick={() => {
             setIsPolylineMode(!isPolylineMode);
-            // Scene.isPolylines = !isPolylineMode;
-
             UpdateMode("polyline");
             render2(world, ctxRef, canvasRef, { x: 0, y: 0 }, isPausedRef);
           }}
