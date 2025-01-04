@@ -276,6 +276,7 @@ function Lab() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    // TODO: Add handleCanvasClick to handlers.js
     const handleCanvasClick = (e) => {
       if (!isPolylineMode && !isCircleMode) return;
 
@@ -301,7 +302,7 @@ function Lab() {
         Scene.polylinePoints = [...Scene.polylinePoints, new Vec2(x, y)];
       }
     };
-
+    // TODO: Add handleDoubleClick to handlers.js
     const handleDoubleClick = (e) => {
       if (!isPolylineMode || Scene.polylinePoints < 3) return;
 
