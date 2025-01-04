@@ -15,7 +15,7 @@ function Lab() {
   const canvasRef = useRef(null);
   const ctxRef = useRef(null);
   const isPausedRef = useRef(false); // Track pause state in ref
-  const [isPaused, setIsPaused] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [carVanish, setCarVanish] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const carRef = useRef(null);
@@ -35,7 +35,7 @@ function Lab() {
     setIsPolylineMode(false);
     setIsCircleMode(false);
     setIsBoxCreationMode(false);
-    setIsPaused(false);
+    setIsPlaying(false);
     if (mode === Scene.mode) {
       Scene.mode = "";
       return;
@@ -48,6 +48,8 @@ function Lab() {
       setIsCircleMode(true);
     } else if (mode === "box") {
       setIsBoxCreationMode(true);
+    } else if (mode === "playing") {
+      setIsPlaying(true);
     }
   }, []);
 
@@ -265,11 +267,14 @@ function Lab() {
   const handlePauseToggle = () => {
     isPausedRef.current = !isPausedRef.current;
 
-    setIsPaused(!isPaused);
-
     if (!isPausedRef.current) {
       render(world, ctxRef, canvasRef, { x: 0, y: 0 }, isPausedRef);
     }
+    // if (Scene.mode === "playing") {
+    //   render(world, ctxRef, canvasRef, { x: 0, y: 0 });
+    // } else {
+    //   Scene.mode === "";
+    // }
   };
 
   const createPolylineBox = useCallback(
@@ -408,6 +413,7 @@ function Lab() {
     ctx.restore();
   }, [mousePos]);
 
+  console.log("=======================================isPlaying", isPlaying);
   return (
     <div>
       <Navbar />
@@ -415,7 +421,7 @@ function Lab() {
         <button
           onClick={() => {
             handlePauseToggle();
-            UpdateMode("pause");
+            UpdateMode("playing");
           }}
           className={`px-4 py-2 rounded ${
             Scene.mode === "paused"
@@ -423,7 +429,7 @@ function Lab() {
               : "bg-green-500 text-white"
           }`}
         >
-          {isPaused ? "Play" : "Pause"}
+          {isPlaying ? "Pause" : "Play"}
         </button>
         <button
           onClick={() => {
