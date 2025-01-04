@@ -28,10 +28,6 @@ function Lab() {
 
   // TODO: turn into custom hook
   const UpdateMode = useCallback((mode) => {
-    console.log(
-      "=======================================Scene.mode",
-      Scene.mode
-    );
     setIsPolylineMode(false);
     setIsCircleMode(false);
     setIsBoxCreationMode(false);
@@ -109,7 +105,6 @@ function Lab() {
     ctxRef.current = ctx;
 
     const mouse = mouseEvents(canvas, setMousePos);
-    console.log("mouse", mouse);
 
     createWalls(world, canvas);
 
@@ -148,7 +143,7 @@ function Lab() {
       density: wheelDensity,
       friction: 0.9,
     });
-    console.log("fixture5", fixture5.getShape().getType());
+
     addFixture(fixture5);
 
     const rightWheel = world.createDynamicBody(
@@ -260,21 +255,11 @@ function Lab() {
   }, []);
 
   useEffect(() => {
-    isPausedRef.current = true;
     render(world, ctxRef, canvasRef, { x: 0, y: 0 }, isPausedRef);
   }, [fixtureList, world]);
 
   const handlePauseToggle = () => {
-    isPausedRef.current = !isPausedRef.current;
-
-    if (!isPausedRef.current) {
-      render(world, ctxRef, canvasRef, { x: 0, y: 0 }, isPausedRef);
-    }
-    // if (Scene.mode === "playing") {
-    //   render(world, ctxRef, canvasRef, { x: 0, y: 0 });
-    // } else {
-    //   Scene.mode === "";
-    // }
+    render(world, ctxRef, canvasRef, { x: 0, y: 0 });
   };
 
   const createPolylineBox = useCallback(
@@ -413,15 +398,14 @@ function Lab() {
     ctx.restore();
   }, [mousePos]);
 
-  console.log("=======================================isPlaying", isPlaying);
   return (
     <div>
       <Navbar />
       <div className="flex gap-2">
         <button
           onClick={() => {
-            handlePauseToggle();
             UpdateMode("playing");
+            handlePauseToggle();
           }}
           className={`px-4 py-2 rounded ${
             Scene.mode === "paused"
@@ -457,7 +441,7 @@ function Lab() {
           onClick={() => {
             setIsPolylineMode(!isPolylineMode);
             UpdateMode("polyline");
-            render(world, ctxRef, canvasRef, { x: 0, y: 0 }, isPausedRef);
+            render(world, ctxRef, canvasRef, { x: 0, y: 0 });
           }}
           className={`px-4 py-2 rounded ${
             isPolylineMode

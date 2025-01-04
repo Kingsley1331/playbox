@@ -3,20 +3,17 @@ import { Scene } from "./World";
 
 const { scale } = Scene;
 
-console.log("rendering123");
 export function render(
   world,
   ctxRef,
   canvasRef,
-  translation = { x: canvas.width / 2, y: canvas.height / 2 },
-  isPausedRef
+  translation = { x: canvas.width / 2, y: canvas.height / 2 }
 ) {
   const canvas = canvasRef.current;
 
   if (world && ctxRef.current) {
-    // const world = worldRef.current;
     const ctx = ctxRef.current;
-    const frameRate = isPausedRef.current ? Infinity : 60;
+    const frameRate = Scene.mode === "playing" ? 60 : Infinity;
 
     world?.step(1 / frameRate);
     // Clear the canvas
@@ -61,15 +58,9 @@ export function render(
       ctx.restore();
     }
 
-    if (!isPausedRef.current || Scene.mode === "polyline") {
+    if (Scene.mode === "playing" || Scene.mode === "polyline") {
       requestAnimationFrame(() =>
-        render(
-          world,
-          ctxRef,
-          canvasRef,
-          { x: translation.x, y: translation.y },
-          isPausedRef
-        )
+        render(world, ctxRef, canvasRef, { x: translation.x, y: translation.y })
       );
     }
   }
