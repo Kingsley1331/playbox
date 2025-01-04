@@ -309,8 +309,8 @@ function Lab() {
       setFixtureList((fixtureList) => [...fixtureList, polyline]);
 
       Scene.polylinePoints = [];
-      setIsPolylineMode(false);
-      UpdateMode("");
+      setIsPolylineMode(false); // TODO: looks like this line is not needed
+      UpdateMode(""); // TODO: Remove this line and fix frame rate bug
     };
 
     canvas.addEventListener("click", handleCanvasClick);
@@ -321,28 +321,6 @@ function Lab() {
       canvas.removeEventListener("dblclick", handleDoubleClick);
     };
   }, [isPolylineMode, createPolylineShape, isCircleMode]);
-
-  useEffect(() => {
-    const ctx = context;
-    // const ctx = ctxRef.current;
-    if (!ctx || !Scene.polylinePoints.length) return;
-
-    ctx.save();
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.beginPath();
-    ctx.scale(scale, -scale);
-    ctx.lineWidth = 0.5 / scale;
-
-    ctx.moveTo(Scene.polylinePoints[0].x, Scene.polylinePoints[0].y);
-    for (let i = 1; i < Scene.polylinePoints.length; i++) {
-      ctx.lineTo(Scene.polylinePoints[i].x, Scene.polylinePoints[i].y);
-    }
-    ctx.lineTo(mousePos.x, -mousePos.y);
-    ctx.strokeStyle = "black";
-    ctx.stroke();
-
-    ctx.restore();
-  }, [mousePos]);
 
   return (
     <div>
@@ -385,7 +363,7 @@ function Lab() {
         </button>
         <button
           onClick={() => {
-            setIsPolylineMode(!isPolylineMode);
+            setIsPolylineMode(!isPolylineMode); // TODO: looks like this line is not needed
             UpdateMode("polyline");
             render(world, canvasRef, { x: 0, y: 0 });
           }}
