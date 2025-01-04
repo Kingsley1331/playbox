@@ -14,7 +14,6 @@ const { scale } = Scene;
 function Lab() {
   const canvasRef = useRef(null);
   const ctxRef = useRef(null);
-  const isPausedRef = useRef(false); // Track pause state in ref
   const [isPlaying, setIsPlaying] = useState(false);
   const [carVanish, setCarVanish] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -199,8 +198,6 @@ function Lab() {
       }
     });
 
-    isPausedRef.current = true;
-
     // Update the mouse joint definition
     const md = {
       maxForce: 10000.0,
@@ -255,7 +252,7 @@ function Lab() {
   }, []);
 
   useEffect(() => {
-    render(world, ctxRef, canvasRef, { x: 0, y: 0 }, isPausedRef);
+    render(world, ctxRef, canvasRef, { x: 0, y: 0 });
   }, [fixtureList, world]);
 
   const handlePauseToggle = () => {
@@ -362,7 +359,7 @@ function Lab() {
 
       const polyline = createPolylineShape(Scene.polylinePoints);
       setFixtureList((fixtureList) => [...fixtureList, polyline]);
-      // setPolylinePoints([]);
+
       Scene.polylinePoints = [];
       setIsPolylineMode(false);
       UpdateMode("");
