@@ -1,13 +1,13 @@
 "use client";
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import planck, { Vec2 } from "planck";
-import { render } from "./rendering";
-import { createWalls } from "../helpers/bodies";
+import { render } from "./helpers/rendering";
+import { createWalls } from "./helpers/bodies";
 import Navbar from "../components/Navbar";
-import { mouseEvents } from "../helpers/utilities";
+import { canvasMouseEvents } from "./helpers/utilities";
 import { Scene } from "./World";
 import { addFixture } from "./World";
-import { setMode } from "../helpers/utilities";
+import { setMode } from "./helpers/utilities";
 
 const { scale } = Scene;
 
@@ -16,14 +16,14 @@ function Lab() {
   const ctxRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [carVanish, setCarVanish] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [mousePosUI, setMousePosUI] = useState({ x: 0, y: 0 });
   const carRef = useRef(null);
-  const mouseJointRef = useRef(null);
-  const selectedBodyRef = useRef(null);
   const [isBoxCreationMode, setIsBoxCreationMode] = useState(false);
   const [isPolylineMode, setIsPolylineMode] = useState(false);
   const [isCircleMode, setIsCircleMode] = useState(false);
   const [fixtureList, setFixtureList] = useState([]);
+
+  const mousePos = Scene.mousePos;
 
   // TODO: turn into custom hook
   const UpdateMode = useCallback((mode) => {
@@ -103,7 +103,7 @@ function Lab() {
     const ctx = canvas?.getContext("2d");
     ctxRef.current = ctx;
 
-    const mouse = mouseEvents(canvas, setMousePos);
+    const mouse = canvasMouseEvents(canvas, setMousePosUI);
 
     createWalls(world, canvas);
 
@@ -195,58 +195,6 @@ function Lab() {
       if (bodyA === car || bodyB === car) {
         console.log("Car collided with something");
         setCarVanish(true);
-      }
-    });
-
-    // Update the mouse joint definition
-    const md = {
-      maxForce: 10000.0,
-      frequencyHz: 5.0,
-      dampingRatio: 0.9,
-    };
-
-    canvas.addEventListener("mousedown", (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / scale;
-      const y = (e.clientY - rect.top) / -scale;
-
-      const aabb = new pl.AABB(
-        new Vec2(x - 0.01, y - 0.01),
-        new Vec2(x + 0.01, y + 0.01)
-      );
-
-      let selectedBody = null;
-      world.queryAABB(aabb, (fixture) => {
-        if (fixture.getBody().isDynamic()) {
-          selectedBody = fixture.getBody();
-          return false;
-        }
-        return true;
-      });
-
-      if (selectedBody) {
-        selectedBodyRef.current = selectedBody;
-        const mouseJoint = world.createJoint(
-          new pl.MouseJoint(md, groundBody, selectedBody, new Vec2(x, y))
-        );
-        mouseJointRef.current = mouseJoint;
-      }
-    });
-
-    canvas.addEventListener("mousemove", (e) => {
-      if (mouseJointRef.current) {
-        const rect = canvas.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / scale;
-        const y = (e.clientY - rect.top) / -scale;
-        mouseJointRef.current.setTarget(new Vec2(x, y));
-      }
-    });
-
-    canvas.addEventListener("mouseup", () => {
-      if (mouseJointRef.current) {
-        world.destroyJoint(mouseJointRef.current);
-        mouseJointRef.current = null;
-        selectedBodyRef.current = null;
       }
     });
   }, []);
@@ -453,7 +401,7 @@ function Lab() {
       </div>
 
       <div className="m-3 w-fit">
-        X: {mousePos.x.toFixed(0)}, Y:{mousePos.y.toFixed(0)}
+        X: {mousePosUI.x.toFixed(0)}, Y:{mousePosUI.y.toFixed(0)}
         <canvas
           ref={canvasRef}
           id="canvas"

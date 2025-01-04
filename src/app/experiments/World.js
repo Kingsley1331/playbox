@@ -10,11 +10,11 @@ Scene.fixtures = fixtures;
 Scene.world = world;
 Scene.scale = 20;
 // Scene.translation = { x: 0, y: 0 };
-// Scene.isPaused = true;
 Scene.polylinePoints = [];
 Scene.mousePos = { x: 0, y: 0 };
 // Scene.isPolylines = false;
 Scene.mode = "";
+Scene.dragAndThrow = { selectedBody: null, mouseJoint: null };
 
 export function addFixture(fixture) {
   Scene.fixtures.push(fixture);

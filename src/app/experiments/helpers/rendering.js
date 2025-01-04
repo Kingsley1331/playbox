@@ -1,5 +1,5 @@
 "use client";
-import { Scene } from "./World";
+import { Scene } from "../World";
 
 const { scale } = Scene;
 
