@@ -5,14 +5,13 @@ const { scale } = Scene;
 
 export function render(
   world,
-  ctxRef,
   canvasRef,
   translation = { x: canvas.width / 2, y: canvas.height / 2 }
 ) {
   const canvas = canvasRef.current;
 
-  if (world && ctxRef.current) {
-    const ctx = ctxRef.current;
+  if (world && Scene.canvas.context) {
+    const ctx = Scene.canvas.context;
     const frameRate = Scene.mode === "playing" ? 60 : Infinity;
 
     world?.step(1 / frameRate);
@@ -60,7 +59,7 @@ export function render(
 
     if (Scene.mode === "playing" || Scene.mode === "polyline") {
       requestAnimationFrame(() =>
-        render(world, ctxRef, canvasRef, { x: translation.x, y: translation.y })
+        render(world, canvasRef, { x: translation.x, y: translation.y })
       );
     }
   }

@@ -9,11 +9,11 @@ import { Scene } from "./World";
 import { addFixture } from "./World";
 import { setMode } from "./helpers/utilities";
 
-const { scale } = Scene;
+const { scale, canvas } = Scene;
+const { context } = canvas;
 
 function Lab() {
   const canvasRef = useRef(null);
-  const ctxRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [carVanish, setCarVanish] = useState(false);
   const [mousePosUI, setMousePosUI] = useState({ x: 0, y: 0 });
@@ -100,8 +100,8 @@ function Lab() {
     addFixture(fixture3);
 
     const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
-    ctxRef.current = ctx;
+
+    Scene.canvas.context = canvas?.getContext("2d");
 
     const mouse = canvasMouseEvents(canvas, setMousePosUI);
 
@@ -200,11 +200,11 @@ function Lab() {
   }, []);
 
   useEffect(() => {
-    render(world, ctxRef, canvasRef, { x: 0, y: 0 });
+    render(world, canvasRef, { x: 0, y: 0 });
   }, [fixtureList, world]);
 
   const handlePauseToggle = () => {
-    render(world, ctxRef, canvasRef, { x: 0, y: 0 });
+    render(world, canvasRef, { x: 0, y: 0 });
   };
 
   const createPolylineBox = useCallback(
@@ -323,7 +323,8 @@ function Lab() {
   }, [isPolylineMode, createPolylineShape, isCircleMode]);
 
   useEffect(() => {
-    const ctx = ctxRef.current;
+    const ctx = context;
+    // const ctx = ctxRef.current;
     if (!ctx || !Scene.polylinePoints.length) return;
 
     ctx.save();
@@ -386,7 +387,7 @@ function Lab() {
           onClick={() => {
             setIsPolylineMode(!isPolylineMode);
             UpdateMode("polyline");
-            render(world, ctxRef, canvasRef, { x: 0, y: 0 });
+            render(world, canvasRef, { x: 0, y: 0 });
           }}
           className={`px-4 py-2 rounded ${
             isPolylineMode
@@ -405,8 +406,8 @@ function Lab() {
         <canvas
           ref={canvasRef}
           id="canvas"
-          width={2400}
-          height={1200}
+          width={canvas.width}
+          height={canvas.height}
           style={{ border: "1px solid #333" }}
         />
       </div>

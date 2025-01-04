@@ -15,6 +15,11 @@ Scene.mousePos = { x: 0, y: 0 };
 // Scene.isPolylines = false;
 Scene.mode = "";
 Scene.dragAndThrow = { selectedBody: null, mouseJoint: null };
+Scene.canvas = {
+  context: null,
+  width: 2400,
+  height: 1200,
+};
 
 export function addFixture(fixture) {
   Scene.fixtures.push(fixture);
