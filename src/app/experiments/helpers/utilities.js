@@ -1,5 +1,4 @@
 import { Scene } from "../World";
-import { mouseDown, mouseUp, mouseMove } from "../events/canvas/handlers";
 
 let { scale, world } = Scene;
 
@@ -14,45 +13,41 @@ export const setMousePos = (mousePos) => {
   Scene.mousePos = mousePos;
 };
 
-export const canvasMouseEvents = (canvas, setMousePosUI) => {
-  const rect = canvas.getBoundingClientRect(); //TODO: Attach rect to Scene.canvas
-
-  const mouseMove1 = (e) => {
-    mouseMove(e, rect, setMousePosUI);
-  };
-
-  const mouseDown1 = (e) => {
-    mouseDown(e, rect, world);
-  };
-
-  const mouseUp1 = (e) => {
-    mouseUp(Scene.world);
-  };
-
-  canvas.addEventListener("mousemove", mouseMove1);
-  canvas.addEventListener("mousedown", mouseDown1);
-  canvas.addEventListener("mouseup", mouseUp1);
-
-  //TODO: Clean up event listeners
-};
-
 export const setMode = (mode) => {
   Scene.mode = mode;
 };
 
-export const attachCanvasEvents = (canvas, events) => {
+export const attachCanvasEvents = (canvas, handlers, setMousePosUI) => {
   const rect = canvas.getBoundingClientRect(); //TODO: Attach rect to Scene.canvas
-  const { mousemove, mousedown, mouseup } = events;
+  const { mouseMove, mouseDown, mouseUp } = handlers;
 
-  canvas.addEventListener("mousemove", mousemove);
-  canvas.addEventListener("mousedown", mousedown);
-  canvas.addEventListener("mouseup", mouseup);
+  const mouseMoveHandler = (e) => {
+    mouseMove(e, rect, setMousePosUI);
+  };
+
+  const mouseDownHandler = (e) => {
+    mouseDown(e, rect, world);
+  };
+
+  const mouseUpHandler = (e) => {
+    mouseUp(Scene.world);
+  };
+
+  Scene.handlers = {
+    mouseMove: mouseMoveHandler,
+    mouseDown: mouseDownHandler,
+    mouseUp: mouseUpHandler,
+  };
+
+  canvas.addEventListener("mousemove", mouseMoveHandler);
+  canvas.addEventListener("mousedown", mouseDownHandler);
+  canvas.addEventListener("mouseup", mouseUpHandler);
 };
 
-export const removeCanvasEvents = (canvas, events) => {
-  const { mousemove, mousedown, mouseup } = events;
+export const removeCanvasEvents = (canvas, handlers) => {
+  const { mouseMove, mouseDown, mouseUp } = handlers;
 
-  canvas.removeEventListener("mousemove", mousemove);
-  canvas.removeEventListener("mousedown", mousedown);
-  canvas.removeEventListener("mouseup", mouseup);
+  canvas.removeEventListener("mousemove", mouseMove);
+  canvas.removeEventListener("mousedown", mouseDown);
+  canvas.removeEventListener("mouseup", mouseUp);
 };

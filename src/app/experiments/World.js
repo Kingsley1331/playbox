@@ -21,6 +21,12 @@ Scene.canvas = {
   height: 1200,
 };
 
+Scene.handlers = {
+  mousemove: null,
+  mousedown: null,
+  mouseup: null,
+};
+
 export function addFixture(fixture) {
   Scene.fixtures.push(fixture);
   //   Scene.fixtures = [...Scene.fixtures, { ...fixture }];

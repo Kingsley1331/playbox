@@ -4,7 +4,8 @@ import planck, { Vec2 } from "planck";
 import { render } from "./helpers/rendering";
 import { createWalls } from "./helpers/bodies";
 import Navbar from "../components/Navbar";
-import { canvasMouseEvents } from "./helpers/utilities";
+import { attachCanvasEvents, removeCanvasEvents } from "./helpers/utilities";
+import { mouseDown, mouseUp, mouseMove } from "./events/canvas/handlers";
 import { Scene } from "./World";
 import { addFixture } from "./World";
 import { setMode } from "./helpers/utilities";
@@ -60,6 +61,7 @@ function Lab() {
   useEffect(() => {
     // Add a ground body for the mouse joint
     const groundBody = world.createBody();
+    const handlers = { mouseDown, mouseUp, mouseMove };
 
     // Stack of boxes
     const stackX = 90;
@@ -103,7 +105,7 @@ function Lab() {
 
     Scene.canvas.context = canvas?.getContext("2d");
 
-    canvasMouseEvents(canvas, setMousePosUI);
+    attachCanvasEvents(canvas, handlers, setMousePosUI);
 
     createWalls(world, canvas);
 
@@ -197,6 +199,10 @@ function Lab() {
         setCarVanish(true);
       }
     });
+
+    return () => {
+      removeCanvasEvents(canvas, Scene.handlers);
+    };
   }, []);
 
   useEffect(() => {
