@@ -103,7 +103,7 @@ function Lab() {
 
     Scene.canvas.context = canvas?.getContext("2d");
 
-    const mouse = canvasMouseEvents(canvas, setMousePosUI);
+    canvasMouseEvents(canvas, setMousePosUI);
 
     createWalls(world, canvas);
 

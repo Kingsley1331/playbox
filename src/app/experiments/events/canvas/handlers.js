@@ -1,10 +1,11 @@
 import planck, { Vec2 } from "planck";
 import { Scene } from "../../World";
+import { mousePosition, setMousePos } from "../../helpers/utilities";
 
 const pl = planck;
 const { scale } = Scene;
 
-export const dragShape = (e, rect, world) => {
+const dragShape = (e, rect, world) => {
   console.log("dragShape");
   const groundBody = world.createBody();
   const x = (e.clientX - rect.left) / scale;
@@ -48,9 +49,28 @@ export const moveShape = (e, rect) => {
   }
 };
 
-export const throwShape = (world) => {
+const throwShape = (world) => {
   if (Scene.dragAndThrow.mouseJoint) {
     world.destroyJoint(Scene.dragAndThrow.mouseJoint);
     Scene.dragAndThrow = { selectedBody: null, mouseJoint: null };
   }
+};
+
+// export const grabShape = (world) => {
+//   console.log("grabShape");
+// };
+
+export const mouseDown = (e, rect, world) => {
+  dragShape(e, rect, world);
+};
+
+export const mouseUp = (world) => {
+  throwShape(world);
+};
+
+export const mouseMove = (e, rect, setMousePosUI) => {
+  const mousePos = mousePosition(e, rect);
+  setMousePos(mousePos);
+  setMousePosUI(mousePos);
+  moveShape(e, rect);
 };

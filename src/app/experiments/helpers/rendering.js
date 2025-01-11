@@ -51,7 +51,7 @@ export function render(
       for (let i = 0; i < Scene.polylinePoints.length; i++) {
         ctx.lineTo(Scene.polylinePoints[i].x, Scene.polylinePoints[i].y);
       }
-      ctx.lineTo(Scene.mousePos.x, -Scene.mousePos.y);
+      ctx.lineTo(Scene.mousePos.x, Scene.mousePos.y);
       ctx.stroke();
       ctx.setLineDash([]);
       ctx.restore();
