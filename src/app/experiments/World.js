@@ -25,6 +25,8 @@ Scene.handlers = {
   mousemove: null,
   mousedown: null,
   mouseup: null,
+  click: null,
+  doubleClick: null,
 };
 
 export function addFixture(fixture) {
