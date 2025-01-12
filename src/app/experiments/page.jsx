@@ -13,11 +13,10 @@ import {
   doubleClick,
 } from "./events/canvas/handlers";
 import { Scene } from "./World";
-import { addFixture } from "./World";
+// import { addFixture } from "./World";
 import { setMode } from "./helpers/utilities";
 
 const { scale, canvas } = Scene;
-const { context } = canvas;
 
 function Lab() {
   const canvasRef = useRef(null);
@@ -25,6 +24,8 @@ function Lab() {
   const [carVanish, setCarVanish] = useState(false);
   const [mousePosUI, setMousePosUI] = useState({ x: 0, y: 0 });
   const carRef = useRef(null);
+  const boxRef = useRef(null);
+  const boxRef2 = useRef(null);
   const [isBoxCreationMode, setIsBoxCreationMode] = useState(false);
   const [isPolylineMode, setIsPolylineMode] = useState(false);
   const [isCircleMode, setIsCircleMode] = useState(false);
@@ -57,12 +58,30 @@ function Lab() {
 
   const world = Scene.world;
 
+  const circleRain = () => {
+    for (let i = 0; i < 200; i++) {
+      const circle = world.createDynamicBody({
+        position: new Vec2(
+          5 + i * 1 + Math.random() * 10,
+          -5 - Math.random() * 10
+        ),
+      });
+      const fixture = circle.createFixture(new pl.Circle(0.25), {
+        density: 1.0,
+        friction: 0.3,
+        restitution: 0.2,
+      });
+    }
+  };
+
   const pl = planck;
-  // useEffect(() => {
-  //   if (carRef && carVanish) {
-  //     worldRef.current.destroyBody(carRef.current);
-  //   }
-  // }, [carVanish]);
+  useEffect(() => {
+    if (carRef && carVanish) {
+      world.destroyBody(boxRef.current);
+      world.destroyBody(boxRef2.current);
+      circleRain();
+    }
+  }, [carVanish, world]);
 
   useEffect(() => {
     // Add a ground body for the mouse joint
@@ -72,7 +91,7 @@ function Lab() {
     // Stack of boxes
     const stackX = 90;
     const boxSize = 1;
-    const numBoxes = 5;
+    const numBoxes = 12;
     for (let i = 0; i < numBoxes; i++) {
       const box = world.createBody({
         type: "dynamic",
@@ -86,7 +105,12 @@ function Lab() {
         friction: 0.5,
         restitution: 0.1,
       });
-      addFixture(fixture);
+      if (i === 0) {
+        boxRef.current = box;
+      } else if (i === 1) {
+        boxRef2.current = box;
+      }
+      // addFixture(fixture);
     }
 
     let car = null;
@@ -94,18 +118,18 @@ function Lab() {
     const fixture = world
       .createDynamicBody(new Vec2(10, -10))
       .createFixture(new pl.Box(2, 2), 5.0);
-    addFixture(fixture);
+    // addFixture(fixture);
 
     const fixture2 = world
       .createDynamicBody(new Vec2(10, -15))
       .createFixture(new pl.Box(2, 2), 5.0);
-    addFixture(fixture2);
+    // addFixture(fixture2);
 
     const fixture3 = world
       .createBody(new Vec2(13, -20))
       .createFixture(new pl.Box(2, 2), 5.0);
 
-    addFixture(fixture3);
+    // addFixture(fixture3);
 
     const canvas = canvasRef.current;
     Scene.canvas.element = canvas;
@@ -136,7 +160,7 @@ function Lab() {
       friction: 0.3,
       restitution: 0.1,
     });
-    addFixture(fixture4);
+    // addFixture(fixture4);
 
     // Wheels
     const wheelRadius = 0.4;
@@ -152,7 +176,7 @@ function Lab() {
       friction: 0.9,
     });
 
-    addFixture(fixture5);
+    // addFixture(fixture5);
 
     const rightWheel = world.createDynamicBody(
       new Vec2(carX + wheelOffsetX, carY + wheelOffsetY)
@@ -161,7 +185,7 @@ function Lab() {
       density: wheelDensity,
       friction: 0.9,
     });
-    addFixture(fixture6);
+    // addFixture(fixture6);
 
     // Enable motors so we can control wheels
     const maxMotorTorque = 80;

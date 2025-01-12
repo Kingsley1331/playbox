@@ -20,8 +20,10 @@ const dragShape = (e, rect, world) => {
   world.queryAABB(aabb, (fixture) => {
     if (fixture.getBody().isDynamic()) {
       selectedBody = fixture.getBody();
+      console.log("===============================>onBody true");
       return false;
     }
+    console.log("===============================>onBody false");
     return true;
   });
 

@@ -30,10 +30,10 @@ Scene.handlers = {
   doubleClick: null,
 };
 
-export function addFixture(fixture) {
-  Scene.fixtures.push(fixture);
-  //   Scene.fixtures = [...Scene.fixtures, { ...fixture }];
-}
+// export function addFixture(fixture) {
+//   Scene.fixtures.push(fixture);
+//   //   Scene.fixtures = [...Scene.fixtures, { ...fixture }];
+// }
 
 // export function addFixtures(world) {
 //   const bodies = world.getBodyList();
