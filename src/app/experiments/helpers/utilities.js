@@ -17,7 +17,12 @@ export const setMode = (mode) => {
   Scene.mode = mode;
 };
 
-export const attachCanvasEvents = (canvas, handlers, setMousePosUI) => {
+export const attachCanvasEvents = (
+  canvas,
+  handlers,
+  setMousePosUI,
+  canvasRef
+) => {
   const rect = canvas.getBoundingClientRect(); //TODO: Attach rect to Scene.canvas
   const { mouseMove, mouseDown, mouseUp, click, doubleClick } = handlers;
 
@@ -34,7 +39,7 @@ export const attachCanvasEvents = (canvas, handlers, setMousePosUI) => {
   };
 
   const clickHandler = (e) => {
-    click(e, rect, Scene.world);
+    click(e, rect, Scene.world, canvasRef);
   };
 
   const doubleClickHandler = (e) => {

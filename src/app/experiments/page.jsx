@@ -111,7 +111,7 @@ function Lab() {
 
     Scene.canvas.context = canvas?.getContext("2d");
 
-    attachCanvasEvents(canvas, handlers, setMousePosUI);
+    attachCanvasEvents(canvas, handlers, setMousePosUI, canvasRef);
 
     createWalls(world, canvas);
 

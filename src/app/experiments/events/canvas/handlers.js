@@ -1,6 +1,7 @@
 import planck, { Vec2 } from "planck";
 import { Scene } from "../../World";
 import { mousePosition, setMousePos } from "../../helpers/utilities";
+import { render } from "../../helpers/rendering";
 
 const pl = planck;
 const { scale } = Scene;
@@ -105,13 +106,14 @@ const createPolylineShape = (world, points) => {
   return body;
 };
 
-const createBox = (e, rect, world) => {
+const createBox = (e, rect, world, canvasRef) => {
   if (Scene.mode !== "box" || !world) return;
   const mousePos = mousePosition(e, rect);
   createPolylineBox(world, mousePos.x, mousePos.y);
+  render(world, canvasRef, { x: 0, y: 0 });
 };
 
-const createCircle = (e, rect, world) => {
+const createCircle = (e, rect, world, canvasRef) => {
   if (Scene.mode !== "circle" || !world) return;
   const mousePos = mousePosition(e, rect);
   const { x, y } = mousePos;
@@ -124,6 +126,7 @@ const createCircle = (e, rect, world) => {
     friction: 0.3,
     restitution: 0.2,
   });
+  render(world, canvasRef, { x: 0, y: 0 });
 };
 
 const createPolyline = (e, rect, world) => {
@@ -133,9 +136,9 @@ const createPolyline = (e, rect, world) => {
   Scene.polylinePoints = [...Scene.polylinePoints, new Vec2(x, y)];
 };
 
-export const click = (e, rect, world) => {
-  createBox(e, rect, world);
-  createCircle(e, rect, world);
+export const click = (e, rect, world, canvasRef) => {
+  createBox(e, rect, world, canvasRef);
+  createCircle(e, rect, world, canvasRef);
   createPolyline(e, rect, world);
 };
 
