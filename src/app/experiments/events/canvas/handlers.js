@@ -99,6 +99,8 @@ const createPolylineShape = (world, points) => {
     friction: 0.3,
     restitution: 0.2,
   });
+  Scene.polylinePoints = [];
+  render(world, { x: 0, y: 0 });
   return body;
 };
 
@@ -145,9 +147,7 @@ export const click = (e, rect, world) => {
 };
 
 export const doubleClick = (world) => {
-  if (Scene.mode !== "polyline" || Scene.polylinePoints.length < 3) return;
-  const polyline = createPolylineShape(world, Scene.polylinePoints);
-  Scene.polylinePoints = [];
+  createPolylineShape(world, Scene.polylinePoints);
 };
 
 export const mouseDown = (e, rect, world) => {
@@ -159,8 +159,8 @@ export const mouseUp = (world) => {
 };
 
 export const mouseMove = (e, rect, setMousePosUI) => {
-  renderPolylinePreview(Scene.world);
   const mousePos = mousePosition(e, rect);
+  renderPolylinePreview(Scene.world);
   setMousePos(mousePos);
   setMousePosUI(mousePos);
   moveShape(e, rect);
