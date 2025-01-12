@@ -106,14 +106,14 @@ const createPolylineShape = (world, points) => {
   return body;
 };
 
-const createBox = (e, rect, world, canvasRef) => {
+const createBox = (e, rect, world) => {
   if (Scene.mode !== "box" || !world) return;
   const mousePos = mousePosition(e, rect);
   createPolylineBox(world, mousePos.x, mousePos.y);
-  render(world, canvasRef, { x: 0, y: 0 });
+  render(world, { x: 0, y: 0 });
 };
 
-const createCircle = (e, rect, world, canvasRef) => {
+const createCircle = (e, rect, world) => {
   if (Scene.mode !== "circle" || !world) return;
   const mousePos = mousePosition(e, rect);
   const { x, y } = mousePos;
@@ -126,12 +126,12 @@ const createCircle = (e, rect, world, canvasRef) => {
     friction: 0.3,
     restitution: 0.2,
   });
-  render(world, canvasRef, { x: 0, y: 0 });
+  render(world, { x: 0, y: 0 });
 };
 
-const renderPolylinePreview = (world, canvasRef) => {
+const renderPolylinePreview = (world) => {
   if (Scene.mode === "polyline") {
-    render(world, canvasRef, { x: 0, y: 0 });
+    render(world, { x: 0, y: 0 });
   }
 };
 
@@ -142,9 +142,9 @@ const createPolyline = (e, rect, world) => {
   Scene.polylinePoints = [...Scene.polylinePoints, new Vec2(x, y)];
 };
 
-export const click = (e, rect, world, canvasRef) => {
-  createBox(e, rect, world, canvasRef);
-  createCircle(e, rect, world, canvasRef);
+export const click = (e, rect, world) => {
+  createBox(e, rect, world);
+  createCircle(e, rect, world);
   createPolyline(e, rect, world);
 };
 
@@ -168,8 +168,8 @@ export const mouseUp = (world) => {
   throwShape(world);
 };
 
-export const mouseMove = (e, rect, setMousePosUI, canvasRef) => {
-  renderPolylinePreview(Scene.world, canvasRef);
+export const mouseMove = (e, rect, setMousePosUI) => {
+  renderPolylinePreview(Scene.world);
   const mousePos = mousePosition(e, rect);
   setMousePos(mousePos);
   setMousePosUI(mousePos);

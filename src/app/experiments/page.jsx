@@ -108,11 +108,11 @@ function Lab() {
     addFixture(fixture3);
 
     const canvas = canvasRef.current;
-    // Scene.canvas.element = canvas;
+    Scene.canvas.element = canvas;
 
     Scene.canvas.context = canvas?.getContext("2d");
 
-    attachCanvasEvents(canvas, handlers, setMousePosUI, canvasRef);
+    attachCanvasEvents(canvas, handlers, setMousePosUI);
 
     createWalls(world, canvas);
 
@@ -213,128 +213,12 @@ function Lab() {
   }, []);
 
   useEffect(() => {
-    render(world, canvasRef, { x: 0, y: 0 });
+    render(world, { x: 0, y: 0 });
   }, [fixtureList, world]);
 
   const handlePauseToggle = () => {
-    render(world, canvasRef, { x: 0, y: 0 });
+    render(world, { x: 0, y: 0 });
   };
-
-  // const createPolylineBox = useCallback(
-  //   (world, x, y) => {
-  //     const boxSize = 0.5;
-  //     const vertices = [
-  //       new Vec2(-boxSize, -boxSize),
-  //       new Vec2(boxSize, -boxSize),
-  //       new Vec2(boxSize, boxSize),
-  //       new Vec2(-boxSize, boxSize),
-  //     ];
-
-  //     const body = world.createDynamicBody({
-  //       position: new Vec2(x, y),
-  //       angularDamping: 0.5,
-  //     });
-
-  //     const polygonShape = new pl.Polygon(vertices);
-  //     const fixture = body.createFixture(polygonShape, {
-  //       density: 1.0,
-  //       friction: 0.3,
-  //       restitution: 0.2,
-  //     });
-  //     addFixture(fixture);
-  //     setFixtureList((fixtureList) => [...fixtureList, body]);
-  //     return body;
-  //   },
-  //   [pl]
-  // );
-
-  // const createPolylineShape = useCallback((points) => {
-  //   if (!world || points.length < 3) return;
-
-  //   const body = world.createDynamicBody({
-  //     position: new Vec2(0, 0), // TODO: we need to set the position to the center of the polygon
-  //     angularDamping: 0.5,
-  //   });
-
-  //   const polygonShape = new pl.Polygon(points);
-
-  //   const fixture = body.createFixture(polygonShape, {
-  //     density: 1.0,
-  //     friction: 0.3,
-  //     restitution: 0.2,
-  //   });
-
-  //   addFixture(fixture);
-
-  //   return body;
-  // }, []);
-
-  // useEffect(() => {
-  //   const canvas = canvasRef.current;
-  //   if (!canvas) return;
-
-  //   const handleCanvasClick = (e) => {
-  //     if (Scene.mode !== "box" || !world) return;
-  //     const rect = canvas.getBoundingClientRect();
-  //     const x = (e.clientX - rect.left) / scale;
-  //     const y = (e.clientY - rect.top) / -scale;
-  //     createPolylineBox(world, x, y);
-  //   };
-
-  //   canvas.addEventListener("click", handleCanvasClick);
-  //   return () => canvas.removeEventListener("click", handleCanvasClick);
-  // }, [isBoxCreationMode, createPolylineBox, world]);
-
-  // useEffect(() => {
-  //   const canvas = canvasRef.current;
-  //   if (!canvas) return;
-
-  //   // TODO: Add handleCanvasClick to handlers.js
-  //   const handleCanvasClick = (e) => {
-  //     if (Scene.mode !== "circle" || !world) return;
-
-  //     const rect = canvas.getBoundingClientRect();
-  //     const x = (e.clientX - rect.left) / scale;
-  //     const y = (e.clientY - rect.top) / -scale;
-
-  //     if (isCircleMode) {
-  //       // create circle
-  //       const circle = world.createDynamicBody({
-  //         position: new Vec2(x, y),
-  //       });
-  //       const fixture = circle.createFixture(new pl.Circle(0.5), {
-  //         density: 1.0,
-  //         friction: 0.3,
-  //         restitution: 0.2,
-  //       });
-  //       addFixture(fixture);
-
-  //       setFixtureList((fixtureList) => [...fixtureList, circle]);
-  //     } else {
-  //       // setPolylinePoints((prev) => [...prev, new Vec2(x, y)]);
-  //       Scene.polylinePoints = [...Scene.polylinePoints, new Vec2(x, y)];
-  //     }
-  //   };
-  //   // TODO: Add handleDoubleClick to handlers.js
-  //   const handleDoubleClick = (e) => {
-  //     if (!isPolylineMode || Scene.polylinePoints < 3) return;
-
-  //     const polyline = createPolylineShape(Scene.polylinePoints);
-  //     setFixtureList((fixtureList) => [...fixtureList, polyline]);
-
-  //     Scene.polylinePoints = [];
-  //     setIsPolylineMode(false); // TODO: looks like this line is not needed
-  //     UpdateMode(""); // TODO: Remove this line and fix frame rate bug
-  //   };
-
-  //   canvas.addEventListener("click", handleCanvasClick);
-  //   canvas.addEventListener("dblclick", handleDoubleClick);
-
-  //   return () => {
-  //     canvas.removeEventListener("click", handleCanvasClick);
-  //     canvas.removeEventListener("dblclick", handleDoubleClick);
-  //   };
-  // }, [isPolylineMode, createPolylineShape, isCircleMode]);
 
   return (
     <div>
@@ -379,7 +263,7 @@ function Lab() {
           onClick={() => {
             setIsPolylineMode(!isPolylineMode); // TODO: looks like this line is not needed
             UpdateMode("polyline");
-            render(world, canvasRef, { x: 0, y: 0 });
+            render(world, { x: 0, y: 0 });
           }}
           className={`px-4 py-2 rounded ${
             isPolylineMode
