@@ -27,7 +27,7 @@ export const attachCanvasEvents = (
   const { mouseMove, mouseDown, mouseUp, click, doubleClick } = handlers;
 
   const mouseMoveHandler = (e) => {
-    mouseMove(e, rect, setMousePosUI);
+    mouseMove(e, rect, setMousePosUI, canvasRef);
   };
 
   const mouseDownHandler = (e) => {

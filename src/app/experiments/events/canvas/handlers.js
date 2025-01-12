@@ -129,6 +129,12 @@ const createCircle = (e, rect, world, canvasRef) => {
   render(world, canvasRef, { x: 0, y: 0 });
 };
 
+const renderPolylinePreview = (world, canvasRef) => {
+  if (Scene.mode === "polyline") {
+    render(world, canvasRef, { x: 0, y: 0 });
+  }
+};
+
 const createPolyline = (e, rect, world) => {
   if (Scene.mode !== "polyline" || !world) return;
   const mousePos = mousePosition(e, rect);
@@ -162,7 +168,8 @@ export const mouseUp = (world) => {
   throwShape(world);
 };
 
-export const mouseMove = (e, rect, setMousePosUI) => {
+export const mouseMove = (e, rect, setMousePosUI, canvasRef) => {
+  renderPolylinePreview(Scene.world, canvasRef);
   const mousePos = mousePosition(e, rect);
   setMousePos(mousePos);
   setMousePosUI(mousePos);

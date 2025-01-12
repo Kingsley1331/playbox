@@ -9,6 +9,7 @@ export function render(
   translation = { x: canvas.width / 2, y: canvas.height / 2 }
 ) {
   const canvas = canvasRef.current;
+  // const canvas = Scene.canvas.element;
 
   if (world && Scene.canvas.context) {
     const ctx = Scene.canvas.context;
@@ -57,7 +58,8 @@ export function render(
       ctx.restore();
     }
 
-    if (Scene.mode === "playing" || Scene.mode === "polyline") {
+    if (Scene.mode === "playing") {
+      // if (Scene.mode === "playing" || Scene.mode === "polyline") {
       requestAnimationFrame(() =>
         render(world, canvasRef, { x: translation.x, y: translation.y })
       );

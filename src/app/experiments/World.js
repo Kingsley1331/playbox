@@ -16,6 +16,7 @@ Scene.mousePos = { x: 0, y: 0 };
 Scene.mode = "";
 Scene.dragAndThrow = { selectedBody: null, mouseJoint: null };
 Scene.canvas = {
+  element: null,
   context: null,
   width: 2400,
   height: 1200,

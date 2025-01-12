@@ -108,6 +108,7 @@ function Lab() {
     addFixture(fixture3);
 
     const canvas = canvasRef.current;
+    // Scene.canvas.element = canvas;
 
     Scene.canvas.context = canvas?.getContext("2d");
 
