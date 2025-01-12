@@ -57,7 +57,6 @@ export function render(
     }
 
     if (Scene.mode === "playing") {
-      // if (Scene.mode === "playing" || Scene.mode === "polyline") {
       requestAnimationFrame(() =>
         render(world, { x: translation.x, y: translation.y })
       );

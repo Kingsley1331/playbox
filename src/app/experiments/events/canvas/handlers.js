@@ -7,7 +7,6 @@ const pl = planck;
 const { scale } = Scene;
 
 const dragShape = (e, rect, world) => {
-  console.log("dragShape");
   const groundBody = world.createBody();
   const x = (e.clientX - rect.left) / scale;
   const y = (e.clientY - rect.top) / -scale;
@@ -81,7 +80,7 @@ const createPolylineBox = (world, x, y) => {
     friction: 0.3,
     restitution: 0.2,
   });
-  console.log("========================>body", body);
+
   return body;
 };
 
@@ -100,9 +99,6 @@ const createPolylineShape = (world, points) => {
     friction: 0.3,
     restitution: 0.2,
   });
-
-  // addFixture(fixture);
-
   return body;
 };
 
@@ -150,14 +146,8 @@ export const click = (e, rect, world) => {
 
 export const doubleClick = (world) => {
   if (Scene.mode !== "polyline" || Scene.polylinePoints.length < 3) return;
-  // if (!isPolylineMode || Scene.polylinePoints < 3) return;
-
   const polyline = createPolylineShape(world, Scene.polylinePoints);
-  // setFixtureList((fixtureList) => [...fixtureList, polyline]);
-
   Scene.polylinePoints = [];
-  // setMode(mode);
-  // UpdateMode(""); // TODO: Remove this line and fix frame rate bug
 };
 
 export const mouseDown = (e, rect, world) => {
