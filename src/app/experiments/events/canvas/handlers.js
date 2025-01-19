@@ -6,40 +6,43 @@ import { render } from "../../helpers/rendering";
 const pl = planck;
 const { scale } = Scene;
 
+export const isStaticBody = (body) => {
+  if (body) {
+    return body.m_type === "static";
+  }
+  return false;
+};
+
 const dragShape = (e, rect, world) => {
-  const groundBody = world.createBody();
-  const x = (e.clientX - rect.left) / scale;
-  const y = (e.clientY - rect.top) / -scale;
+  if (Scene.mode === "playing") {
+    const groundBody = world.createBody();
+    const x = (e.clientX - rect.left) / scale;
+    const y = (e.clientY - rect.top) / -scale;
 
-  const aabb = new pl.AABB(
-    new Vec2(x - 0.01, y - 0.01),
-    new Vec2(x + 0.01, y + 0.01)
-  );
-
-  let selectedBody = null;
-  world.queryAABB(aabb, (fixture) => {
-    if (fixture.getBody().isDynamic()) {
-      selectedBody = fixture.getBody();
-      console.log("===============================>onBody true");
-      return false;
-    }
-    console.log("===============================>onBody false");
-    return true;
-  });
-
-  // Update the mouse joint definition
-  const md = {
-    maxForce: 10000.0,
-    frequencyHz: 5.0,
-    dampingRatio: 0.9,
-  };
-
-  if (selectedBody) {
-    Scene.dragAndThrow.selectedBody = selectedBody;
-    const mouseJoint = world.createJoint(
-      new pl.MouseJoint(md, groundBody, selectedBody, new Vec2(x, y))
+    const aabb = new pl.AABB(
+      new Vec2(x - 0.01, y - 0.01),
+      new Vec2(x + 0.01, y + 0.01)
     );
-    Scene.dragAndThrow.mouseJoint = mouseJoint;
+
+    let selectedBody = null;
+    world.queryAABB(aabb, (fixture) => {
+      selectedBody = fixture.getBody();
+    });
+
+    // Update the mouse joint definition
+    const md = {
+      maxForce: 10000.0,
+      frequencyHz: 5.0,
+      dampingRatio: 0.9,
+    };
+
+    if (selectedBody) {
+      Scene.dragAndThrow.selectedBody = selectedBody;
+      const mouseJoint = world.createJoint(
+        new pl.MouseJoint(md, groundBody, selectedBody, new Vec2(x, y))
+      );
+      Scene.dragAndThrow.mouseJoint = mouseJoint;
+    }
   }
 };
 
@@ -51,6 +54,48 @@ export const moveShape = (e, rect) => {
   }
 };
 
+const relocateShape = (x, y, world) => {
+  const body = Scene.dragAndDrop.selectedBody;
+  if (Scene.dragAndDrop.dragging && Scene.mode === "") {
+    if (body) {
+      body.setPosition(new Vec2(x, y));
+
+      if (isStaticBody(body)) {
+        // Store the body's properties
+        let fixtures = body.getFixtureList();
+        const userData = body.getUserData();
+
+        // Destroy old body
+        world.destroyBody(body);
+
+        // Create new body at new position
+        const newBody = world.createBody({
+          type: "static",
+          position: { x, y },
+        });
+
+        // Transfer fixtures and data
+        while (fixtures) {
+          newBody.createFixture(fixtures.getShape(), fixtures.getDensity());
+          fixtures = fixtures.getNext();
+        }
+        newBody.setUserData(userData);
+        Scene.dragAndDrop.selectedBody = newBody;
+      } else {
+        // For non-static bodies, normal position setting works
+        body.setPosition({ x, y });
+        body.setAwake(true);
+      }
+    }
+    render(world, { x: 0, y: 0 });
+  }
+};
+
+const releaseShape = () => {
+  Scene.dragAndDrop.dragging = false;
+  Scene.dragAndDrop.selectedBody = null;
+};
+
 const throwShape = (world) => {
   if (Scene.dragAndThrow.mouseJoint) {
     world.destroyJoint(Scene.dragAndThrow.mouseJoint);
@@ -58,9 +103,22 @@ const throwShape = (world) => {
   }
 };
 
-// export const grabShape = (world) => {
-//   console.log("grabShape");
-// };
+export const grabShape = (e, rect, world) => {
+  if (Scene.mode === "") {
+    const x = (e.clientX - rect.left) / scale;
+    const y = (e.clientY - rect.top) / -scale;
+    const aabb = new pl.AABB(
+      new Vec2(x - 0.01, y - 0.01),
+      new Vec2(x + 0.01, y + 0.01)
+    );
+    let selectedBody = null;
+    world.queryAABB(aabb, (fixture) => {
+      selectedBody = fixture.getBody();
+      Scene.dragAndDrop.selectedBody = selectedBody;
+      Scene.dragAndDrop.dragging = true;
+    });
+  }
+};
 
 const createPolylineBox = (world, x, y) => {
   const boxSize = 0.5;
@@ -154,10 +212,12 @@ export const doubleClick = (world) => {
 
 export const mouseDown = (e, rect, world) => {
   dragShape(e, rect, world);
+  grabShape(e, rect, world);
 };
 
 export const mouseUp = (world) => {
   throwShape(world);
+  releaseShape();
 };
 
 export const mouseMove = (e, rect, setMousePosUI) => {
@@ -166,4 +226,5 @@ export const mouseMove = (e, rect, setMousePosUI) => {
   setMousePos(mousePos);
   setMousePosUI(mousePos);
   moveShape(e, rect);
+  relocateShape(mousePos.x, mousePos.y, Scene.world);
 };

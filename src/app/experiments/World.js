@@ -15,6 +15,7 @@ Scene.mousePos = { x: 0, y: 0 };
 // Scene.isPolylines = false;
 Scene.mode = "";
 Scene.dragAndThrow = { selectedBody: null, mouseJoint: null };
+Scene.dragAndDrop = { selectedBody: null };
 Scene.canvas = {
   element: null,
   context: null,
