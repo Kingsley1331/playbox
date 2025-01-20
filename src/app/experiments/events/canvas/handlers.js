@@ -146,13 +146,24 @@ const createPolylineBox = (world, x, y) => {
 
 const createPolylineShape = (world, points) => {
   if (!world || points.length < 3) return;
+  const numPoints = points.length;
+  let centerOfMass = points.reduce(
+    (sum, point) => sum.add(point),
+    new Vec2(0, 0)
+  );
+  centerOfMass = new Vec2(
+    centerOfMass.x / numPoints,
+    centerOfMass.y / numPoints
+  );
+
+  const reCenteredPoints = points.map((point) => point.sub(centerOfMass));
 
   const body = world.createDynamicBody({
-    position: new Vec2(0, 0), // TODO: we need to set the position to the center of the polygon
+    position: centerOfMass,
     angularDamping: 0.5,
   });
 
-  const polygonShape = new pl.Polygon(points);
+  const polygonShape = new pl.Polygon(reCenteredPoints);
 
   const fixture = body.createFixture(polygonShape, {
     density: 1.0,
