@@ -16,8 +16,7 @@ export const isStaticBody = (body) => {
 const dragShape = (e, rect, world) => {
   if (Scene.mode === "playing") {
     const groundBody = world.createBody();
-    const x = (e.clientX - rect.left) / scale;
-    const y = (e.clientY - rect.top) / -scale;
+    const { x, y } = mousePosition(e, rect);
 
     const aabb = new pl.AABB(
       new Vec2(x - 0.01, y - 0.01),
@@ -48,8 +47,7 @@ const dragShape = (e, rect, world) => {
 
 export const moveShape = (e, rect) => {
   if (Scene.dragAndThrow.mouseJoint) {
-    const x = (e.clientX - rect.left) / scale;
-    const y = (e.clientY - rect.top) / -scale;
+    const { x, y } = mousePosition(e, rect);
     Scene.dragAndThrow.mouseJoint.setTarget(new Vec2(x, y));
   }
 };
@@ -105,8 +103,7 @@ const throwShape = (world) => {
 
 export const grabShape = (e, rect, world) => {
   if (Scene.mode === "") {
-    const x = (e.clientX - rect.left) / scale;
-    const y = (e.clientY - rect.top) / -scale;
+    const { x, y } = mousePosition(e, rect);
     const aabb = new pl.AABB(
       new Vec2(x - 0.01, y - 0.01),
       new Vec2(x + 0.01, y + 0.01)
@@ -184,8 +181,7 @@ const createBox = (e, rect, world) => {
 
 const createCircle = (e, rect, world) => {
   if (Scene.mode !== "circle" || !world) return;
-  const mousePos = mousePosition(e, rect);
-  const { x, y } = mousePos;
+  const { x, y } = mousePosition(e, rect);
   // create circle
   const circle = world.createDynamicBody({
     position: new Vec2(x, y),
@@ -206,8 +202,7 @@ const renderPolylinePreview = (world) => {
 
 const createPolyline = (e, rect, world) => {
   if (Scene.mode !== "polyline" || !world) return;
-  const mousePos = mousePosition(e, rect);
-  const { x, y } = mousePos;
+  const { x, y } = mousePosition(e, rect);
   Scene.polylinePoints = [...Scene.polylinePoints, new Vec2(x, y)];
 };
 
