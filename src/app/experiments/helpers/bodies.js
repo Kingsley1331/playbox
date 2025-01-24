@@ -1,5 +1,5 @@
 import planck, { Vec2 } from "planck";
-import { Scene } from "../experiments/World";
+import { Scene } from "../World";
 
 const { scale } = Scene;
 
