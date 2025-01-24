@@ -4,7 +4,6 @@ import { mousePosition, setMousePos } from "../../helpers/utilities";
 import { render } from "../../helpers/rendering";
 
 const pl = planck;
-const { scale } = Scene;
 
 export const isStaticBody = (body) => {
   if (body) {
@@ -100,6 +99,21 @@ const throwShape = (world) => {
     Scene.dragAndThrow = { selectedBody: null, mouseJoint: null };
   }
 };
+
+// const handleRotationMove = (e) => {
+//   if (!Scene.selectedBody || !Scene.rotationStartPoint) return;
+
+//   // Calculate angle between start point and current mouse position
+//   const center = Scene.selectedBody.getPosition();
+//   const startAngle = Math.atan2(
+//     Scene.rotationStartPoint.y - center.y,
+//     Scene.rotationStartPoint.x - center.x
+//   );
+//   const currentAngle = Math.atan2(e.clientY - center.y, e.clientX - center.x);
+
+//   const deltaAngle = currentAngle - startAngle;
+//   Scene.selectedBody.setAngle(Scene.rotationStartAngle + deltaAngle);
+// };
 
 export const grabShape = (e, rect, world) => {
   if (Scene.mode === "") {
