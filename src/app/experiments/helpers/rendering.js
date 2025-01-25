@@ -115,16 +115,17 @@ export function drawBody(ctx, body) {
   // Draw the bounding box
   const aabb = getBodyAABB(body);
   if (aabb && Scene.mode === "" && body === Scene.dragAndDrop.selectedBody) {
+    const padding = 0.4; // Padding in world units
     ctx.save();
     ctx.strokeStyle = "blue";
     ctx.lineWidth = 1 / scale;
     ctx.setLineDash([0.5, 0.5]);
     ctx.beginPath();
     ctx.rect(
-      aabb.lowerBound.x,
-      aabb.lowerBound.y,
-      aabb.upperBound.x - aabb.lowerBound.x,
-      aabb.upperBound.y - aabb.lowerBound.y
+      aabb.lowerBound.x - padding,
+      aabb.lowerBound.y - padding,
+      aabb.upperBound.x - aabb.lowerBound.x + padding * 2,
+      aabb.upperBound.y - aabb.lowerBound.y + padding * 2
     );
     ctx.stroke();
     ctx.restore();
