@@ -61,6 +61,7 @@ const relocateShape = (x, y, world) => {
         // Store the body's properties
         let fixtures = body.getFixtureList();
         const userData = body.getUserData();
+        const angle = body.getAngle();
 
         // Destroy old body
         world.destroyBody(body);
@@ -69,6 +70,7 @@ const relocateShape = (x, y, world) => {
         const newBody = world.createBody({
           type: "static",
           position: { x, y },
+          angle,
         });
 
         // Transfer fixtures and data
@@ -90,7 +92,7 @@ const relocateShape = (x, y, world) => {
 
 const releaseShape = () => {
   Scene.dragAndDrop.dragging = false;
-  Scene.dragAndDrop.selectedBody = null;
+  // Scene.dragAndDrop.selectedBody = null;
 };
 
 const throwShape = (world) => {
@@ -99,21 +101,6 @@ const throwShape = (world) => {
     Scene.dragAndThrow = { selectedBody: null, mouseJoint: null };
   }
 };
-
-// const handleRotationMove = (e) => {
-//   if (!Scene.selectedBody || !Scene.rotationStartPoint) return;
-
-//   // Calculate angle between start point and current mouse position
-//   const center = Scene.selectedBody.getPosition();
-//   const startAngle = Math.atan2(
-//     Scene.rotationStartPoint.y - center.y,
-//     Scene.rotationStartPoint.x - center.x
-//   );
-//   const currentAngle = Math.atan2(e.clientY - center.y, e.clientX - center.x);
-
-//   const deltaAngle = currentAngle - startAngle;
-//   Scene.selectedBody.setAngle(Scene.rotationStartAngle + deltaAngle);
-// };
 
 export const grabShape = (e, rect, world) => {
   if (Scene.mode === "") {
@@ -222,6 +209,9 @@ const createPolyline = (e, rect, world) => {
 };
 
 export const click = (e, rect, world) => {
+  if (Scene.rotationMode) {
+    return;
+  }
   createBox(e, rect, world);
   createCircle(e, rect, world);
   createPolyline(e, rect, world);
@@ -231,21 +221,62 @@ export const doubleClick = (world) => {
   createPolylineShape(world, Scene.polylinePoints);
 };
 
-export const mouseDown = (e, rect, world) => {
-  dragShape(e, rect, world);
-  grabShape(e, rect, world);
-};
+function isPointInCircle(px, py, cx, cy, radius) {
+  const dx = px - cx;
+  const dy = py - cy;
+  return dx * dx + dy * dy <= radius * radius;
+}
 
-export const mouseUp = (world) => {
-  throwShape(world);
-  releaseShape();
-};
+export function mouseDown(e) {
+  const rect = Scene.canvas.element.getBoundingClientRect();
+  const { x, y } = mousePosition(e, rect);
 
-export const mouseMove = (e, rect, setMousePosUI) => {
-  const mousePos = mousePosition(e, rect);
+  dragShape(e, rect, Scene.world);
+  grabShape(e, rect, Scene.world);
+
+  if (Scene.dragAndDrop.selectedBody?.rotationHandle) {
+    const handle = Scene.dragAndDrop.selectedBody.rotationHandle;
+    if (isPointInCircle(x, y, handle.x, handle.y, handle.radius)) {
+      Scene.rotationMode = {
+        body: Scene.dragAndDrop.selectedBody,
+        center: Scene.dragAndDrop.selectedBody.getPosition(),
+        startAngle: Math.atan2(
+          y - Scene.dragAndDrop.selectedBody.getPosition().y,
+          x - Scene.dragAndDrop.selectedBody.getPosition().x
+        ),
+      };
+      return;
+    }
+  }
+}
+
+export function mouseMove(e) {
+  const rect = Scene.canvas.element.getBoundingClientRect();
+  const x = (e.clientX - rect.left) / Scene.scale;
+  const y = -(e.clientY - rect.top) / Scene.scale;
+
+  if (Scene.rotationMode) {
+    const currentAngle = Math.atan2(
+      y - Scene.rotationMode.center.y,
+      x - Scene.rotationMode.center.x
+    );
+    const deltaAngle = currentAngle - Scene.rotationMode.startAngle;
+    Scene.rotationMode.body.setAngle(
+      Scene.rotationMode.body.getAngle() + deltaAngle
+    );
+    Scene.rotationMode.startAngle = currentAngle;
+    Scene.rotationMode.deltaAngle = deltaAngle;
+    render(Scene.world, { x: 0, y: 0 });
+  }
+
   renderPolylinePreview(Scene.world);
-  setMousePos(mousePos);
-  setMousePosUI(mousePos);
+  setMousePos(new Vec2(x, y));
   moveShape(e, rect);
-  relocateShape(mousePos.x, mousePos.y, Scene.world);
-};
+  relocateShape(x, y, Scene.world);
+}
+
+export function mouseUp(e) {
+  throwShape(Scene.world);
+  releaseShape();
+  Scene.rotationMode = null;
+}

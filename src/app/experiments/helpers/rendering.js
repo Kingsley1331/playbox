@@ -112,11 +112,15 @@ export function drawBody(ctx, body) {
     ctx.restore();
   }
 
-  // Draw the bounding box
+  // Draw the bounding box and rotation handle
   const aabb = getBodyAABB(body);
   if (aabb && Scene.mode === "" && body === Scene.dragAndDrop.selectedBody) {
-    const padding = 0.4; // Padding in world units
+    const padding = 0.4;
+    const handleHeight = 4.0; // Height of rotation handle
+    const handleRadius = 0.5; // Radius of rotation handle circle
+
     ctx.save();
+    // Draw bounding box
     ctx.strokeStyle = "blue";
     ctx.lineWidth = 1 / scale;
     ctx.setLineDash([0.5, 0.5]);
@@ -128,6 +132,31 @@ export function drawBody(ctx, body) {
       aabb.upperBound.y - aabb.lowerBound.y + padding * 2
     );
     ctx.stroke();
+
+    // Draw rotation handle
+    ctx.setLineDash([]); // Solid line for handle
+    ctx.beginPath();
+    const handleX = (aabb.lowerBound.x + aabb.upperBound.x) / 2;
+    const handleBottomY = aabb.upperBound.y + padding;
+    const handleTopY = handleBottomY + handleHeight;
+
+    // Draw vertical line
+    ctx.moveTo(handleX, handleBottomY);
+    ctx.lineTo(handleX, handleTopY);
+    ctx.stroke();
+
+    // Draw circle at top
+    ctx.beginPath();
+    ctx.arc(handleX, handleTopY, handleRadius, 0, 2 * Math.PI);
+    ctx.stroke();
+
+    // Store handle position for hit testing
+    body.rotationHandle = {
+      x: handleX,
+      y: handleTopY,
+      radius: handleRadius,
+    };
+
     ctx.restore();
   }
 }
