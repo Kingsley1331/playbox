@@ -263,10 +263,80 @@ function scaleBody(body, originalFixtures, scale) {
   render(Scene.world, { x: 0, y: 0 });
 }
 
+function isPointNearVertex(px, py, vx, vy, threshold = 0.2) {
+  const dx = px - vx;
+  const dy = py - vy;
+  return Math.sqrt(dx * dx + dy * dy) <= threshold;
+}
+
+function getLocalPoint(worldX, worldY, body) {
+  // Convert world point to local body coordinates
+  const bodyPosition = body.getPosition();
+  const bodyAngle = body.getAngle();
+  const cos = Math.cos(-bodyAngle);
+  const sin = Math.sin(-bodyAngle);
+
+  const dx = worldX - bodyPosition.x;
+  const dy = worldY - bodyPosition.y;
+
+  return {
+    x: dx * cos - dy * sin,
+    y: dx * sin + dy * cos,
+  };
+}
+
+function getWorldPoint(localX, localY, body) {
+  // Convert local body coordinates to world point
+  const bodyPosition = body.getPosition();
+  const bodyAngle = body.getAngle();
+  const cos = Math.cos(bodyAngle);
+  const sin = Math.sin(bodyAngle);
+
+  return {
+    x: localX * cos - localY * sin + bodyPosition.x,
+    y: localX * sin + localY * cos + bodyPosition.y,
+  };
+}
+
 export function mouseDown(e) {
   const rect = Scene.canvas.element.getBoundingClientRect();
   const x = (e.clientX - rect.left) / Scene.scale;
   const y = -(e.clientY - rect.top) / Scene.scale;
+
+  // Check if clicking a vertex of the selected body
+  if (Scene.dragAndDrop.selectedBody) {
+    const localPoint = getLocalPoint(x, y, Scene.dragAndDrop.selectedBody);
+
+    let fixture = Scene.dragAndDrop.selectedBody.getFixtureList();
+    let fixtureIndex = 0;
+
+    while (fixture) {
+      const shape = fixture.getShape();
+      if (shape.getType() === "polygon") {
+        const vertices = shape.m_vertices;
+        for (let i = 0; i < vertices.length; i++) {
+          if (
+            isPointNearVertex(
+              localPoint.x,
+              localPoint.y,
+              vertices[i].x,
+              vertices[i].y
+            )
+          ) {
+            Scene.vertexDragMode = {
+              body: Scene.dragAndDrop.selectedBody,
+              fixture: fixture,
+              vertexIndex: i,
+              originalVertices: vertices.map((v) => ({ x: v.x, y: v.y })),
+            };
+            return;
+          }
+        }
+      }
+      fixture = fixture.getNext();
+      fixtureIndex++;
+    }
+  }
 
   // Check if clicking rotation handle
   if (Scene.dragAndDrop.selectedBody?.rotationHandle) {
@@ -317,7 +387,6 @@ export function mouseDown(e) {
           originalFixtures,
           originalAABB: getBodyAABB(Scene.dragAndDrop.selectedBody),
         };
-        // return;
       }
     }
   }
@@ -329,6 +398,48 @@ export function mouseMove(e) {
   const rect = Scene.canvas.element.getBoundingClientRect();
   const x = (e.clientX - rect.left) / Scene.scale;
   const y = -(e.clientY - rect.top) / Scene.scale;
+
+  if (Scene.vertexDragMode) {
+    const localPoint = getLocalPoint(x, y, Scene.vertexDragMode.body);
+    const shape = Scene.vertexDragMode.fixture.getShape();
+
+    if (shape.getType() === "polygon") {
+      // Update the vertex position
+      shape.m_vertices[Scene.vertexDragMode.vertexIndex].x = localPoint.x;
+      shape.m_vertices[Scene.vertexDragMode.vertexIndex].y = localPoint.y;
+
+      // Validate the new polygon shape
+      const vertices = shape.m_vertices;
+      let isValid = true;
+
+      // Check if the polygon is still convex and not self-intersecting
+      for (let i = 0; i < vertices.length; i++) {
+        const i1 = i;
+        const i2 = (i + 1) % vertices.length;
+        const i3 = (i + 2) % vertices.length;
+
+        const dx1 = vertices[i2].x - vertices[i1].x;
+        const dy1 = vertices[i2].y - vertices[i1].y;
+        const dx2 = vertices[i3].x - vertices[i2].x;
+        const dy2 = vertices[i3].y - vertices[i2].y;
+
+        // Cross product should be positive for convex polygon
+        if (dx1 * dy2 - dy1 * dx2 <= 0) {
+          isValid = false;
+          break;
+        }
+      }
+
+      // If the new shape is invalid, revert to original vertices
+      if (!isValid) {
+        for (let i = 0; i < vertices.length; i++) {
+          vertices[i].x = Scene.vertexDragMode.originalVertices[i].x;
+          vertices[i].y = Scene.vertexDragMode.originalVertices[i].y;
+        }
+      }
+    }
+    render(Scene.world, { x: 0, y: 0 });
+  }
 
   if (Scene.rotationMode) {
     const currentAngle = Math.atan2(
@@ -383,6 +494,11 @@ export function mouseMove(e) {
 }
 
 export function mouseUp(e) {
+  if (Scene.vertexDragMode) {
+    Scene.vertexDragMode = null;
+    return;
+  }
+
   if (Scene.rotationMode) {
     Scene.rotationMode = null;
     return;

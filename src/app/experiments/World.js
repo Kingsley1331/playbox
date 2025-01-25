@@ -52,4 +52,6 @@ Scene.handlers = {
 
 Scene.resizeMode = null;
 
+Scene.vertexDragMode = null;
+
 export { Scene };
