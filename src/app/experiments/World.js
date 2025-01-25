@@ -50,4 +50,6 @@ Scene.handlers = {
 //   }
 // }
 
+Scene.resizeMode = null;
+
 export { Scene };

@@ -112,12 +112,19 @@ export function drawBody(ctx, body) {
     ctx.restore();
   }
 
-  // Draw the bounding box and rotation handle
+  // Draw the bounding box and handles
   const aabb = getBodyAABB(body);
   if (aabb && Scene.mode === "" && body === Scene.dragAndDrop.selectedBody) {
     const padding = 0.4;
-    const handleHeight = 4.0; // Height of rotation handle
-    const handleRadius = 0.5; // Radius of rotation handle circle
+    const handleHeight = 1.0;
+    const handleRadius = 0.5;
+    const resizeHandleSize = 0.6; // Size of resize handles
+
+    // Calculate padded bounds
+    const left = aabb.lowerBound.x - padding;
+    const right = aabb.upperBound.x + padding;
+    const top = aabb.upperBound.y + padding;
+    const bottom = aabb.lowerBound.y - padding;
 
     ctx.save();
     // Draw bounding box
@@ -125,32 +132,54 @@ export function drawBody(ctx, body) {
     ctx.lineWidth = 1 / scale;
     ctx.setLineDash([0.5, 0.5]);
     ctx.beginPath();
-    ctx.rect(
-      aabb.lowerBound.x - padding,
-      aabb.lowerBound.y - padding,
-      aabb.upperBound.x - aabb.lowerBound.x + padding * 2,
-      aabb.upperBound.y - aabb.lowerBound.y + padding * 2
-    );
+    ctx.rect(left, bottom, right - left, top - bottom);
     ctx.stroke();
 
-    // Draw rotation handle
-    ctx.setLineDash([]); // Solid line for handle
-    ctx.beginPath();
-    const handleX = (aabb.lowerBound.x + aabb.upperBound.x) / 2;
-    const handleBottomY = aabb.upperBound.y + padding;
-    const handleTopY = handleBottomY + handleHeight;
+    // Draw resize handles at corners
+    ctx.setLineDash([]);
+    ctx.fillStyle = "white";
+    ctx.strokeStyle = "blue";
 
-    // Draw vertical line
-    ctx.moveTo(handleX, handleBottomY);
+    const corners = [
+      { x: left, y: top, position: "topLeft" },
+      { x: right, y: top, position: "topRight" },
+      { x: right, y: bottom, position: "bottomRight" },
+      { x: left, y: bottom, position: "bottomLeft" },
+    ];
+
+    body.resizeHandles = {};
+    corners.forEach((corner) => {
+      ctx.beginPath();
+      ctx.rect(
+        corner.x - resizeHandleSize / 2,
+        corner.y - resizeHandleSize / 2,
+        resizeHandleSize,
+        resizeHandleSize
+      );
+      ctx.fill();
+      ctx.stroke();
+
+      // Store handle positions for hit testing
+      body.resizeHandles[corner.position] = {
+        x: corner.x,
+        y: corner.y,
+        size: resizeHandleSize,
+      };
+    });
+
+    // Draw rotation handle
+    const handleX = (left + right) / 2;
+    const handleTopY = top + handleHeight;
+
+    ctx.beginPath();
+    ctx.moveTo(handleX, top);
     ctx.lineTo(handleX, handleTopY);
     ctx.stroke();
 
-    // Draw circle at top
     ctx.beginPath();
     ctx.arc(handleX, handleTopY, handleRadius, 0, 2 * Math.PI);
     ctx.stroke();
 
-    // Store handle position for hit testing
     body.rotationHandle = {
       x: handleX,
       y: handleTopY,
@@ -161,7 +190,7 @@ export function drawBody(ctx, body) {
   }
 }
 
-function getBodyAABB(body) {
+export function getBodyAABB(body) {
   let aabb = null;
 
   // Loop through all fixtures of the body

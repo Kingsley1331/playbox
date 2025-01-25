@@ -1,7 +1,7 @@
 import planck, { Vec2 } from "planck";
 import { Scene } from "../../World";
 import { mousePosition, setMousePos } from "../../helpers/utilities";
-import { render } from "../../helpers/rendering";
+import { render, getBodyAABB } from "../../helpers/rendering";
 
 const pl = planck;
 
@@ -227,13 +227,38 @@ function isPointInCircle(px, py, cx, cy, radius) {
   return dx * dx + dy * dy <= radius * radius;
 }
 
+function isPointInRect(px, py, rx, ry, size) {
+  const halfSize = size / 2;
+  return (
+    px >= rx - halfSize &&
+    px <= rx + halfSize &&
+    py >= ry - halfSize &&
+    py <= ry + halfSize
+  );
+}
+
+function scaleBody(body, originalVertices, scaleX, scaleY) {
+  let fixtures = body.getFixtureList();
+  while (fixtures) {
+    const shape = fixtures.getShape();
+    if (shape.getType() === "polygon") {
+      const vertices = shape.m_vertices;
+      for (let i = 0; i < vertices.length; i++) {
+        vertices[i].x = originalVertices[i].x * scaleX;
+        vertices[i].y = originalVertices[i].y * scaleY;
+      }
+    }
+    // For circles, we could adjust the radius here if needed
+    fixtures = fixtures.getNext();
+  }
+}
+
 export function mouseDown(e) {
   const rect = Scene.canvas.element.getBoundingClientRect();
-  const { x, y } = mousePosition(e, rect);
+  const x = (e.clientX - rect.left) / Scene.scale;
+  const y = -(e.clientY - rect.top) / Scene.scale;
 
-  dragShape(e, rect, Scene.world);
-  grabShape(e, rect, Scene.world);
-
+  // Check if clicking rotation handle
   if (Scene.dragAndDrop.selectedBody?.rotationHandle) {
     const handle = Scene.dragAndDrop.selectedBody.rotationHandle;
     if (isPointInCircle(x, y, handle.x, handle.y, handle.radius)) {
@@ -248,6 +273,40 @@ export function mouseDown(e) {
       return;
     }
   }
+
+  // Check if clicking resize handles
+  if (Scene.dragAndDrop.selectedBody?.resizeHandles) {
+    for (const [position, handle] of Object.entries(
+      Scene.dragAndDrop.selectedBody.resizeHandles
+    )) {
+      if (isPointInRect(x, y, handle.x, handle.y, handle.size)) {
+        // Store original vertices for scaling
+        const originalVertices = [];
+        let fixtures = Scene.dragAndDrop.selectedBody.getFixtureList();
+        while (fixtures) {
+          const shape = fixtures.getShape();
+          if (shape.getType() === "polygon") {
+            shape.m_vertices.forEach((v) =>
+              originalVertices.push({ x: v.x, y: v.y })
+            );
+          }
+          fixtures = fixtures.getNext();
+        }
+
+        Scene.resizeMode = {
+          body: Scene.dragAndDrop.selectedBody,
+          handle: position,
+          startPoint: { x, y },
+          originalVertices,
+          originalAABB: getBodyAABB(Scene.dragAndDrop.selectedBody),
+        };
+        return;
+      }
+    }
+  }
+
+  dragShape(e, rect, Scene.world);
+  grabShape(e, rect, Scene.world);
 }
 
 export function mouseMove(e) {
@@ -269,6 +328,40 @@ export function mouseMove(e) {
     render(Scene.world, { x: 0, y: 0 });
   }
 
+  if (Scene.resizeMode) {
+    const dx = x - Scene.resizeMode.startPoint.x;
+    const dy = y - Scene.resizeMode.startPoint.y;
+    const aabb = Scene.resizeMode.originalAABB;
+    const width = aabb.upperBound.x - aabb.lowerBound.x;
+    const height = aabb.upperBound.y - aabb.lowerBound.y;
+
+    // Calculate diagonal distance for uniform scaling
+    const originalDiagonal = Math.sqrt(width * width + height * height);
+    let newDiagonal;
+
+    switch (Scene.resizeMode.handle) {
+      case "topRight":
+      case "bottomRight":
+        newDiagonal = originalDiagonal + dx;
+        break;
+      case "topLeft":
+      case "bottomLeft":
+        newDiagonal = originalDiagonal - dx;
+        break;
+    }
+
+    // Calculate uniform scale factor
+    const scale = Math.max(0.1, newDiagonal / originalDiagonal);
+
+    scaleBody(
+      Scene.resizeMode.body,
+      Scene.resizeMode.originalVertices,
+      scale,
+      scale
+    );
+    render(Scene.world, { x: 0, y: 0 });
+  }
+
   renderPolylinePreview(Scene.world);
   setMousePos(new Vec2(x, y));
   moveShape(e, rect);
@@ -276,7 +369,16 @@ export function mouseMove(e) {
 }
 
 export function mouseUp(e) {
+  if (Scene.rotationMode) {
+    Scene.rotationMode = null;
+    return;
+  }
+
+  if (Scene.resizeMode) {
+    Scene.resizeMode = null;
+    return;
+  }
+
   throwShape(Scene.world);
   releaseShape();
-  Scene.rotationMode = null;
 }
