@@ -260,6 +260,7 @@ function scaleBody(body, originalFixtures, scale) {
     fixture = fixture.getNext();
     fixtureIndex++;
   }
+  render(Scene.world, { x: 0, y: 0 });
 }
 
 export function mouseDown(e) {
@@ -340,7 +341,6 @@ export function mouseMove(e) {
     );
     Scene.rotationMode.startAngle = currentAngle;
     render(Scene.world, { x: 0, y: 0 });
-    return;
   }
 
   if (Scene.resizeMode) {
@@ -373,7 +373,6 @@ export function mouseMove(e) {
       Scene.resizeMode.originalFixtures,
       scaleFactor
     );
-    render(Scene.world, { x: 0, y: 0 });
     return;
   }
 

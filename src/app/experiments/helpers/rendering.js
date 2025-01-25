@@ -90,16 +90,47 @@ export function drawBody(ctx, body) {
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
+
+      // Draw vertices if body is selected
+      // TODO: Reduce repetition of code
+      if (body === Scene.dragAndDrop.selectedBody) {
+        ctx.fillStyle = "black";
+        vertices.forEach((vertex) => {
+          ctx.beginPath();
+          ctx.arc(vertex.x, vertex.y, 0.2, 0, 2 * Math.PI);
+          ctx.fill();
+        });
+      }
     } else if (type === "circle") {
       ctx.beginPath();
       ctx.arc(shape.m_p.x, shape.m_p.y, shape.m_radius, 0, 2 * Math.PI);
       ctx.fill();
       ctx.stroke();
+
+      // Draw center point if body is selected
+      // TODO: Reduce repetition of code
+      if (body === Scene.dragAndDrop.selectedBody) {
+        ctx.fillStyle = "red";
+        ctx.beginPath();
+        ctx.arc(shape.m_p.x, shape.m_p.y, 0.1, 0, 2 * Math.PI);
+        ctx.fill();
+      }
     } else if (type === "edge") {
       ctx.beginPath();
       ctx.moveTo(shape.m_vertex1.x, shape.m_vertex1.y);
       ctx.lineTo(shape.m_vertex2.x, shape.m_vertex2.y);
       ctx.stroke();
+
+      // Draw vertices if body is selected
+      // TODO: Reduce repetition of code
+      if (body === Scene.dragAndDrop.selectedBody) {
+        ctx.fillStyle = "red";
+        [shape.m_vertex1, shape.m_vertex2].forEach((vertex) => {
+          ctx.beginPath();
+          ctx.arc(vertex.x, vertex.y, 0.1, 0, 2 * Math.PI);
+          ctx.fill();
+        });
+      }
     } else if (type === "chain") {
       ctx.beginPath();
       const vertices = shape.m_vertices;
@@ -108,12 +139,24 @@ export function drawBody(ctx, body) {
         ctx.lineTo(vertices[i].x, vertices[i].y);
       }
       ctx.stroke();
+
+      // Draw vertices if body is selected
+      // TODO: Reduce repetition of code
+      if (body === Scene.dragAndDrop.selectedBody) {
+        ctx.fillStyle = "green";
+        vertices.forEach((vertex) => {
+          ctx.beginPath();
+          ctx.arc(vertex.x, vertex.y, 0.1, 0, 2 * Math.PI);
+          ctx.fill();
+        });
+      }
     }
     ctx.restore();
   }
 
   // Draw the bounding box and handles
   const aabb = getBodyAABB(body);
+  // console.log("aabb", aabb);
   if (aabb && Scene.mode === "" && body === Scene.dragAndDrop.selectedBody) {
     const padding = 0.4;
     const handleHeight = 1.0;
