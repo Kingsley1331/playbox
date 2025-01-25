@@ -237,19 +237,28 @@ function isPointInRect(px, py, rx, ry, size) {
   );
 }
 
-function scaleBody(body, originalVertices, scaleX, scaleY) {
-  let fixtures = body.getFixtureList();
-  while (fixtures) {
-    const shape = fixtures.getShape();
+function scaleBody(body, originalFixtures, scale) {
+  let fixture = body.getFixtureList();
+  let fixtureIndex = 0;
+
+  while (fixture) {
+    const shape = fixture.getShape();
+    const originalShape = originalFixtures[fixtureIndex];
+
     if (shape.getType() === "polygon") {
       const vertices = shape.m_vertices;
+      const originalVertices = originalShape.vertices;
+
       for (let i = 0; i < vertices.length; i++) {
-        vertices[i].x = originalVertices[i].x * scaleX;
-        vertices[i].y = originalVertices[i].y * scaleY;
+        vertices[i].x = originalVertices[i].x * scale;
+        vertices[i].y = originalVertices[i].y * scale;
       }
+    } else if (shape.getType() === "circle") {
+      shape.m_radius = originalShape.radius * scale;
     }
-    // For circles, we could adjust the radius here if needed
-    fixtures = fixtures.getNext();
+
+    fixture = fixture.getNext();
+    fixtureIndex++;
   }
 }
 
@@ -280,31 +289,37 @@ export function mouseDown(e) {
       Scene.dragAndDrop.selectedBody.resizeHandles
     )) {
       if (isPointInRect(x, y, handle.x, handle.y, handle.size)) {
-        // Store original vertices for scaling
-        const originalVertices = [];
-        let fixtures = Scene.dragAndDrop.selectedBody.getFixtureList();
-        while (fixtures) {
-          const shape = fixtures.getShape();
+        // Store original fixture data
+        const originalFixtures = [];
+        let fixture = Scene.dragAndDrop.selectedBody.getFixtureList();
+
+        while (fixture) {
+          const shape = fixture.getShape();
           if (shape.getType() === "polygon") {
-            shape.m_vertices.forEach((v) =>
-              originalVertices.push({ x: v.x, y: v.y })
-            );
+            originalFixtures.push({
+              type: "polygon",
+              vertices: shape.m_vertices.map((v) => ({ x: v.x, y: v.y })),
+            });
+          } else if (shape.getType() === "circle") {
+            originalFixtures.push({
+              type: "circle",
+              radius: shape.m_radius,
+            });
           }
-          fixtures = fixtures.getNext();
+          fixture = fixture.getNext();
         }
 
         Scene.resizeMode = {
           body: Scene.dragAndDrop.selectedBody,
           handle: position,
           startPoint: { x, y },
-          originalVertices,
+          originalFixtures,
           originalAABB: getBodyAABB(Scene.dragAndDrop.selectedBody),
         };
-        return;
+        // return;
       }
     }
   }
-
   dragShape(e, rect, Scene.world);
   grabShape(e, rect, Scene.world);
 }
@@ -324,8 +339,8 @@ export function mouseMove(e) {
       Scene.rotationMode.body.getAngle() + deltaAngle
     );
     Scene.rotationMode.startAngle = currentAngle;
-    Scene.rotationMode.deltaAngle = deltaAngle;
     render(Scene.world, { x: 0, y: 0 });
+    return;
   }
 
   if (Scene.resizeMode) {
@@ -351,15 +366,15 @@ export function mouseMove(e) {
     }
 
     // Calculate uniform scale factor
-    const scale = Math.max(0.1, newDiagonal / originalDiagonal);
+    const scaleFactor = Math.max(0.1, newDiagonal / originalDiagonal);
 
     scaleBody(
       Scene.resizeMode.body,
-      Scene.resizeMode.originalVertices,
-      scale,
-      scale
+      Scene.resizeMode.originalFixtures,
+      scaleFactor
     );
     render(Scene.world, { x: 0, y: 0 });
+    return;
   }
 
   renderPolylinePreview(Scene.world);
