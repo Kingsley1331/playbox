@@ -111,4 +111,46 @@ export function drawBody(ctx, body) {
     }
     ctx.restore();
   }
+
+  // Draw the bounding box
+  const aabb = getBodyAABB(body);
+  if (aabb && Scene.mode === "" && body === Scene.dragAndDrop.selectedBody) {
+    ctx.save();
+    ctx.strokeStyle = "blue";
+    ctx.lineWidth = 1 / scale;
+    ctx.setLineDash([0.5, 0.5]);
+    ctx.beginPath();
+    ctx.rect(
+      aabb.lowerBound.x,
+      aabb.lowerBound.y,
+      aabb.upperBound.x - aabb.lowerBound.x,
+      aabb.upperBound.y - aabb.lowerBound.y
+    );
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function getBodyAABB(body) {
+  let aabb = null;
+
+  // Loop through all fixtures of the body
+  for (
+    let fixture = body.getFixtureList();
+    fixture;
+    fixture = fixture.getNext()
+  ) {
+    const shape = fixture.getShape();
+    const transform = body.getTransform();
+    const shapeAABB = fixture.getAABB(0); // Get AABB directly from fixture
+
+    if (!aabb) {
+      aabb = shapeAABB;
+    } else {
+      // Combine AABBs
+      aabb.combine(shapeAABB);
+    }
+  }
+
+  return aabb;
 }
