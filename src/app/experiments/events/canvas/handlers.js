@@ -128,6 +128,7 @@ export const grabShape = (e, rect, world) => {
       Scene.dragAndDrop.selectedBody = selectedBody;
       Scene.dragAndDrop.dragging = true;
     });
+    render(world, { x: 0, y: 0 });
   }
 };
 
