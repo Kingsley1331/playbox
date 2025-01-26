@@ -221,25 +221,34 @@ export const doubleClick = (e, rect, world) => {
   createPolylineShape(world, Scene.polylinePoints);
   const { x, y } = mousePosition(e, rect);
 
-  // Get mouse position and query for fixture
-  const point = new Vec2(x, y);
+  if (!Scene.dragAndDrop.selectedFixture) {
+    // Get mouse position and query for fixture
+    const point = new Vec2(x, y);
 
-  // Query all bodies in the area
-  const aabb = new pl.AABB(
-    new Vec2(x - 0.01, y - 0.01),
-    new Vec2(x + 0.01, y + 0.01)
-  );
+    // Query all bodies in the area
+    const aabb = new pl.AABB(
+      new Vec2(x - 0.01, y - 0.01),
+      new Vec2(x + 0.01, y + 0.01)
+    );
 
-  world.queryAABB(aabb, (fixture) => {
-    // Test if the point is actually inside this fixture
-    if (fixture.testPoint(point)) {
-      console.log("======================fixture", fixture);
-      Scene.dragAndDrop.selectedFixture = fixture;
-      render(world, { x: 0, y: 0 });
-      return true; // Stop querying after finding a match
-    }
-    return false; // Continue searching if point not in this fixture
-  });
+    world.queryAABB(aabb, (fixture) => {
+      // Test if the point is actually inside this fixture
+      if (fixture.testPoint(point)) {
+        console.log("======================fixture", fixture);
+        Scene.dragAndDrop.selectedFixture = fixture;
+        render(world, { x: 0, y: 0 });
+        return true; // Stop querying after finding a match
+      }
+      return false; // Continue searching if point not in this fixture
+    });
+    return;
+  }
+
+  if (Scene.dragAndDrop.selectedFixture) {
+    console.log("======================deselecting fixture");
+    Scene.dragAndDrop.selectedFixture = null;
+  }
+  render(world, { x: 0, y: 0 });
 };
 
 function isPointInCircle(px, py, cx, cy, radius) {
