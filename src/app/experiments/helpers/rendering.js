@@ -56,6 +56,15 @@ export function render(
       ctx.restore();
     }
 
+    // Draw selection box if there's a selected fixture
+    if (Scene.dragAndDrop.selectedFixture) {
+      drawSelectedFixtureBoundingBox(
+        ctx,
+        Scene.dragAndDrop.selectedFixture,
+        scale
+      );
+    }
+
     if (Scene.mode === "playing") {
       requestAnimationFrame(() =>
         render(world, { x: translation.x, y: translation.y })
@@ -246,15 +255,13 @@ export function getBodyAABB(body, selectedFixture) {
     fixture;
     fixture = fixture.getNext()
   ) {
-    const shape = fixture.getShape();
-    const transform = body.getTransform();
-    const shapeAABB = fixture.getAABB(0); // Get AABB directly from fixture
+    const fixtureAABB = fixture.getAABB(0); // Get AABB directly from fixture
 
     if (!aabb) {
-      aabb = shapeAABB;
+      aabb = fixtureAABB;
     } else {
       // Combine AABBs
-      aabb.combine(shapeAABB);
+      aabb.combine(fixtureAABB);
     }
   }
 
@@ -262,7 +269,65 @@ export function getBodyAABB(body, selectedFixture) {
 }
 
 export function getFixtureAABB(fixture) {
-  const shape = fixture.getShape();
-  const transform = fixture.getBody().getTransform();
-  return shape.getAABB(transform);
+  return fixture.getAABB(0); // Get AABB directly from fixture, 0 is the child index
 }
+
+export const drawSelectedFixtureBoundingBox = (ctx, fixture, scale) => {
+  if (!fixture) return;
+
+  const shape = fixture.getShape();
+  const body = fixture.getBody();
+  const pos = body.getPosition();
+  const angle = body.getAngle();
+
+  // Save current transform state
+  ctx.save();
+
+  // Move to body position and rotate
+  ctx.strokeStyle = "#ff0000"; // Red color for fixture selection
+  ctx.lineWidth = 2;
+  ctx.setLineDash([5, 5]); // Create dashed line effect
+
+  // Transform context to body's position and rotation
+  ctx.translate(pos.x * scale, -pos.y * scale);
+  ctx.rotate(-angle);
+
+  // Draw based on shape type
+  const type = shape.getType();
+  if (type === "polygon") {
+    const vertices = shape.m_vertices;
+    ctx.beginPath();
+    ctx.moveTo(vertices[0].x * scale, -vertices[0].y * scale);
+    for (let i = 1; i < vertices.length; i++) {
+      ctx.lineTo(vertices[i].x * scale, -vertices[i].y * scale);
+    }
+    ctx.closePath();
+    ctx.stroke();
+  } else if (type === "circle") {
+    ctx.beginPath();
+    ctx.arc(
+      shape.m_p.x * scale,
+      -shape.m_p.y * scale,
+      shape.m_radius * scale,
+      0,
+      2 * Math.PI
+    );
+    ctx.stroke();
+  } else if (type === "edge") {
+    ctx.beginPath();
+    ctx.moveTo(shape.m_vertex1.x * scale, -shape.m_vertex1.y * scale);
+    ctx.lineTo(shape.m_vertex2.x * scale, -shape.m_vertex2.y * scale);
+    ctx.stroke();
+  } else if (type === "chain") {
+    const vertices = shape.m_vertices;
+    ctx.beginPath();
+    ctx.moveTo(vertices[0].x * scale, -vertices[0].y * scale);
+    for (let i = 1; i < vertices.length; i++) {
+      ctx.lineTo(vertices[i].x * scale, -vertices[i].y * scale);
+    }
+    ctx.stroke();
+  }
+
+  // Restore transform state
+  ctx.restore();
+};
