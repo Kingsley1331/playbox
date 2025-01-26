@@ -241,6 +241,7 @@ export const doubleClick = (e, rect, world) => {
       }
       return false; // Continue searching if point not in this fixture
     });
+    render(world, { x: 0, y: 0 });
     return;
   }
 
@@ -249,6 +250,7 @@ export const doubleClick = (e, rect, world) => {
     Scene.dragAndDrop.selectedFixture = null;
   }
   render(world, { x: 0, y: 0 });
+  return;
 };
 
 function isPointInCircle(px, py, cx, cy, radius) {
