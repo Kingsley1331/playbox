@@ -38,7 +38,7 @@ export const attachCanvasEvents = (canvas, handlers, setMousePosUI) => {
   };
 
   const doubleClickHandler = (e) => {
-    doubleClick(world);
+    doubleClick(e, rect, world);
   };
 
   Scene.handlers = {

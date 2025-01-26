@@ -155,7 +155,7 @@ export function drawBody(ctx, body) {
   }
 
   // Draw the bounding box and handles
-  const aabb = getBodyAABB(body);
+  const aabb = getBodyAABB(body, Scene.dragAndDrop.selectedFixture);
   // console.log("aabb", aabb);
   if (aabb && Scene.mode === "" && body === Scene.dragAndDrop.selectedBody) {
     const padding = 0.4;
@@ -233,7 +233,11 @@ export function drawBody(ctx, body) {
   }
 }
 
-export function getBodyAABB(body) {
+export function getBodyAABB(body, selectedFixture) {
+  if (selectedFixture) {
+    return getFixtureAABB(selectedFixture);
+  }
+
   let aabb = null;
 
   // Loop through all fixtures of the body
@@ -255,4 +259,10 @@ export function getBodyAABB(body) {
   }
 
   return aabb;
+}
+
+export function getFixtureAABB(fixture) {
+  const shape = fixture.getShape();
+  const transform = fixture.getBody().getTransform();
+  return shape.getAABB(transform);
 }
