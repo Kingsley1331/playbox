@@ -5,6 +5,13 @@ import { render, getBodyAABB } from "../../helpers/rendering";
 
 const pl = planck;
 
+const BOX_VERTICES = [
+  new Vec2(-0.5, -0.5),
+  new Vec2(0.5, -0.5),
+  new Vec2(0.5, 0.5),
+  new Vec2(-0.5, 0.5),
+];
+
 export const isStaticBody = (body) => {
   if (body) {
     return body.m_type === "static";
@@ -119,32 +126,9 @@ export const grabShape = (e, rect, world) => {
   }
 };
 
-const createPolylineBox = (world, x, y) => {
-  const boxSize = 0.5;
-  const vertices = [
-    new Vec2(-boxSize, -boxSize),
-    new Vec2(boxSize, -boxSize),
-    new Vec2(boxSize, boxSize),
-    new Vec2(-boxSize, boxSize),
-  ];
-
-  const body = world.createDynamicBody({
-    position: new Vec2(x, y),
-    angularDamping: 0.5,
-  });
-
-  const polygonShape = new pl.Polygon(vertices);
-  const fixture = body.createFixture(polygonShape, {
-    density: 1.0,
-    friction: 0.3,
-    restitution: 0.2,
-  });
-
-  return body;
-};
-
-const createPolylineShape = (world, points) => {
+const createPolylineShape = (world, points, shouldRecenter = false) => {
   if (!world || points.length < 3) return;
+  const mousePos = Scene.mousePos;
   const numPoints = points.length;
   let centerOfMass = points.reduce(
     (sum, point) => sum.add(point),
@@ -155,10 +139,12 @@ const createPolylineShape = (world, points) => {
     centerOfMass.y / numPoints
   );
 
-  const reCenteredPoints = points.map((point) => point.sub(centerOfMass));
+  const reCenteredPoints = shouldRecenter
+    ? points.map((point) => point.sub(centerOfMass))
+    : points;
 
   const body = world.createDynamicBody({
-    position: centerOfMass,
+    position: shouldRecenter ? centerOfMass : mousePos,
     angularDamping: 0.5,
   });
 
@@ -176,8 +162,7 @@ const createPolylineShape = (world, points) => {
 
 const createBox = (e, rect, world) => {
   if (Scene.mode !== "box" || !world) return;
-  const mousePos = mousePosition(e, rect);
-  createPolylineBox(world, mousePos.x, mousePos.y);
+  createPolylineShape(world, BOX_VERTICES);
   render(world, { x: 0, y: 0 });
 };
 
@@ -218,7 +203,7 @@ export const click = (e, rect, world) => {
 };
 
 export const doubleClick = (e, rect, world) => {
-  createPolylineShape(world, Scene.polylinePoints);
+  createPolylineShape(world, Scene.polylinePoints, true);
   const { x, y } = mousePosition(e, rect);
 
   if (!Scene.dragAndDrop.selectedFixture) {

@@ -215,21 +215,41 @@ function Lab() {
         rightWheel.getPosition()
       )
     );
-
-    const bottom = new pl.Box(1.5, 0.15);
-    const left = new pl.Box(0.15, 2.7, new Vec2(-2, 4), 0.2);
-    const right = new pl.Box(0.15, 2.7, new Vec2(2, 4), -0.2);
+    const scaleFactor = 3;
+    const bottom = new pl.Box(1.5 * scaleFactor, 0.15 * scaleFactor);
+    const left = new pl.Box(
+      0.15 * scaleFactor,
+      2.7 * scaleFactor,
+      new Vec2(-2 * scaleFactor, 4 * scaleFactor),
+      0.2
+    );
+    const right = new pl.Box(
+      0.15 * scaleFactor,
+      2.7 * scaleFactor,
+      new Vec2(2 * scaleFactor, 4 * scaleFactor),
+      -0.2
+    );
 
     const container = world.createBody(new Vec2(40, -40));
     container.createFixture(bottom, 4.0);
     container.createFixture(left, 4.0);
     container.createFixture(right, 4.0);
     //======================================================================
-    const bottom2 = new pl.Box(1.5, 0.15);
-    const left2 = new pl.Box(0.15, 2.7, new Vec2(-2, 4), 0.2);
-    const right2 = new pl.Box(0.15, 2.7, new Vec2(2, 4), -0.2);
+    const bottom2 = new pl.Box(1.5 * scaleFactor, 0.15 * scaleFactor);
+    const left2 = new pl.Box(
+      0.15 * scaleFactor,
+      2.7 * scaleFactor,
+      new Vec2(-2 * scaleFactor, 4 * scaleFactor),
+      0.2
+    );
+    const right2 = new pl.Box(
+      0.15 * scaleFactor,
+      2.7 * scaleFactor,
+      new Vec2(2 * scaleFactor, 4 * scaleFactor),
+      -0.2
+    );
 
-    const container2 = world.createDynamicBody(new Vec2(60, -40));
+    const container2 = world.createDynamicBody(new Vec2(70, -40));
     container2.createFixture(bottom2, 4.0);
     container2.createFixture(left2, 4.0);
     container2.createFixture(right2, 4.0);
