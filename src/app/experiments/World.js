@@ -16,6 +16,7 @@ Scene.mousePos = { x: 0, y: 0 };
 Scene.mode = "";
 Scene.dragAndThrow = { selectedBody: null, mouseJoint: null };
 Scene.dragAndDrop = { selectedBody: null };
+Scene.isAddingFixture = false;
 Scene.canvas = {
   element: null,
   context: null,

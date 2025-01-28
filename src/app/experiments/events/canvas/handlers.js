@@ -125,6 +125,35 @@ export const grabShape = (e, rect, world) => {
     render(world, { x: 0, y: 0 });
   }
 };
+const addFixtureToBody = (body, fixture) => {
+  body.createFixture(fixture.getShape(), fixture.getDensity());
+};
+
+const removeFixtureFromBody = (body, fixture) => {
+  body.destroyFixture(fixture);
+};
+
+const createFixtureAndAddToBody = (body, vertices) => {
+  const bodyPos = body.getPosition();
+  const mousePos = Scene.mousePos;
+  const offset = mousePos.sub(bodyPos);
+  const originalVertices = vertices.map((v) => new Vec2(v.x, v.y));
+  // const originalVertices = [...vertices.map((v) => new Vec2(v.x, v.y))];
+
+  const offsetVertices = vertices.map((v) => {
+    return new Vec2(v.x + offset.x, v.y + offset.y);
+  });
+
+  const polygonShape = new pl.Polygon(
+    Scene.isAddingFixture ? offsetVertices : originalVertices
+  );
+  const fixture = body.createFixture(polygonShape, {
+    density: 1.0,
+    friction: 0.3,
+    restitution: 0.2,
+  });
+  return fixture;
+};
 
 const createPolylineShape = (world, points, shouldRecenter = false) => {
   if (!world || points.length < 3) return;
@@ -148,13 +177,11 @@ const createPolylineShape = (world, points, shouldRecenter = false) => {
     angularDamping: 0.5,
   });
 
-  const polygonShape = new pl.Polygon(reCenteredPoints);
+  createFixtureAndAddToBody(
+    Scene.isAddingFixture ? Scene.dragAndDrop.selectedBody : body,
+    reCenteredPoints
+  );
 
-  const fixture = body.createFixture(polygonShape, {
-    density: 1.0,
-    friction: 0.3,
-    restitution: 0.2,
-  });
   Scene.polylinePoints = [];
   render(world, { x: 0, y: 0 });
   return body;

@@ -30,6 +30,7 @@ function Lab() {
   const [isPolylineMode, setIsPolylineMode] = useState(false);
   const [isCircleMode, setIsCircleMode] = useState(false);
   const [fixtureList, setFixtureList] = useState([]);
+  const [isAddingFixture, setIsAddingFixture] = useState(false);
 
   const mousePos = Scene.mousePos;
 
@@ -336,6 +337,19 @@ function Lab() {
           {isPolylineMode
             ? `Creating Shape (${isPolylineMode} points)`
             : "Create Polyline Shape"}
+        </button>
+        <button
+          className={`px-4 py-2 rounded ${
+            isAddingFixture
+              ? "bg-green-500 text-white"
+              : "bg-blue-500 text-white"
+          }`}
+          onClick={() => {
+            setIsAddingFixture(!isAddingFixture);
+            Scene.isAddingFixture = !isAddingFixture;
+          }}
+        >
+          Add fixture
         </button>
       </div>
 
