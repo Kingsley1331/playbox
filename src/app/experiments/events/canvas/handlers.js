@@ -135,11 +135,16 @@ const removeFixtureFromBody = (body, fixture) => {
 
 const createFixtureAndAddToBody = (body, vertices) => {
   const bodyPos = body.getPosition();
-  const mousePos = Scene.mousePos;
-  const offset = mousePos.sub(bodyPos);
+  const bodyAngle = -body.getAngle();
+  const { x, y } = Scene.mousePos;
+  const offset = new Vec2(x - bodyPos.x, y - bodyPos.y);
+  const rotatedOffset = new Vec2(
+    offset.x * Math.cos(bodyAngle) - offset.y * Math.sin(bodyAngle),
+    offset.x * Math.sin(bodyAngle) + offset.y * Math.cos(bodyAngle)
+  );
 
   const offsetVertices = vertices.map((v) => {
-    return new Vec2(v.x + offset.x, v.y + offset.y);
+    return new Vec2(v.x + rotatedOffset.x, v.y + rotatedOffset.y);
   });
 
   const polygonShape = new pl.Polygon(
