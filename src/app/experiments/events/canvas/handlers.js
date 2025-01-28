@@ -137,15 +137,13 @@ const createFixtureAndAddToBody = (body, vertices) => {
   const bodyPos = body.getPosition();
   const mousePos = Scene.mousePos;
   const offset = mousePos.sub(bodyPos);
-  const originalVertices = vertices.map((v) => new Vec2(v.x, v.y));
-  // const originalVertices = [...vertices.map((v) => new Vec2(v.x, v.y))];
 
   const offsetVertices = vertices.map((v) => {
     return new Vec2(v.x + offset.x, v.y + offset.y);
   });
 
   const polygonShape = new pl.Polygon(
-    Scene.isAddingFixture ? offsetVertices : originalVertices
+    Scene.isAddingFixture ? offsetVertices : vertices
   );
   const fixture = body.createFixture(polygonShape, {
     density: 1.0,
