@@ -144,11 +144,11 @@ const createFixtureAndAddToBody = (
   body,
   vertices,
   center,
-  shouldRecenter = false
+  isCustomPolyline = false
 ) => {
   const bodyPos = body.getPosition();
   const bodyAngle = -body.getAngle();
-  const { x, y } = shouldRecenter ? center : Scene.mousePos; // center of fixture as defined by vertices
+  const { x, y } = isCustomPolyline ? center : Scene.mousePos; // center of fixture as defined by vertices
   const roatedVertices = vertices.map((v) => {
     return rotateVector(v, bodyAngle);
   });
@@ -157,7 +157,7 @@ const createFixtureAndAddToBody = (
 
   const rotatedOffset = rotateVector(offset, bodyAngle);
 
-  const offsetVertices = (shouldRecenter ? roatedVertices : vertices).map(
+  const offsetVertices = (isCustomPolyline ? roatedVertices : vertices).map(
     (v) => {
       return new Vec2(v.x + rotatedOffset.x, v.y + rotatedOffset.y);
     }
@@ -174,20 +174,19 @@ const createFixtureAndAddToBody = (
   return fixture;
 };
 
-const createPolylineShape = (world, points, shouldRecenter = false) => {
-  console.log("======================points", points);
+const createPolylineShape = (world, points, isCustomPolyline = false) => {
   if (!world || points.length < 3) return;
   const mousePos = Scene.mousePos;
   const numPoints = points.length;
   let center = points.reduce((sum, point) => sum.add(point), new Vec2(0, 0));
   center = new Vec2(center.x / numPoints, center.y / numPoints);
 
-  const reCalculatedPoints = shouldRecenter
+  const reCalculatedPoints = isCustomPolyline
     ? points.map((point) => point.sub(center))
     : points;
 
   const body = world.createDynamicBody({
-    position: shouldRecenter ? center : mousePos,
+    position: isCustomPolyline ? center : mousePos,
     angularDamping: 0.5,
   });
 
@@ -195,7 +194,7 @@ const createPolylineShape = (world, points, shouldRecenter = false) => {
     Scene.isAddingFixture ? Scene.dragAndDrop.selectedBody : body,
     reCalculatedPoints,
     center,
-    shouldRecenter
+    isCustomPolyline
   );
 
   Scene.polylinePoints = [];
