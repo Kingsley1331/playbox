@@ -199,15 +199,38 @@ const createBox = (e, rect, world) => {
 const createCircle = (e, rect, world) => {
   if (Scene.mode !== "circle" || !world) return;
   const { x, y } = mousePosition(e, rect);
-  // create circle
-  const circle = world.createDynamicBody({
-    position: new Vec2(x, y),
-  });
-  const fixture = circle.createFixture(new pl.Circle(0.5), {
+
+  let body;
+  let rotatedOffset = new Vec2(0, 0);
+
+  if (Scene.isAddingFixture) {
+    body = Scene.dragAndDrop.selectedBody;
+    const bodyPos = body.getPosition();
+    const bodyAngle = -body.getAngle();
+
+    const offset = new Vec2(x - bodyPos.x, y - bodyPos.y);
+    rotatedOffset = new Vec2(
+      offset.x * Math.cos(bodyAngle) - offset.y * Math.sin(bodyAngle),
+      offset.x * Math.sin(bodyAngle) + offset.y * Math.cos(bodyAngle)
+    );
+  } else {
+    body = world.createDynamicBody({
+      position: new Vec2(x, y),
+    });
+  }
+
+  // Create the circle shape first
+  const circleShape = new pl.Circle(0.5);
+  circleShape.m_p.set(rotatedOffset.x, rotatedOffset.y); // Set the local position
+
+  // Create the fixture with the shape
+  const fixture = body.createFixture({
+    shape: circleShape,
     density: 1.0,
     friction: 0.3,
     restitution: 0.2,
   });
+
   render(world, { x: 0, y: 0 });
 };
 
