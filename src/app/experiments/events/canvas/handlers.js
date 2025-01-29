@@ -133,19 +133,35 @@ const removeFixtureFromBody = (body, fixture) => {
   body.destroyFixture(fixture);
 };
 
-const createFixtureAndAddToBody = (body, vertices) => {
+const rotateVector = (vector, angle) => {
+  return new Vec2(
+    vector.x * Math.cos(angle) - vector.y * Math.sin(angle),
+    vector.x * Math.sin(angle) + vector.y * Math.cos(angle)
+  );
+};
+
+const createFixtureAndAddToBody = (
+  body,
+  vertices,
+  center,
+  shouldRecenter = false
+) => {
   const bodyPos = body.getPosition();
   const bodyAngle = -body.getAngle();
-  const { x, y } = Scene.mousePos;
-  const offset = new Vec2(x - bodyPos.x, y - bodyPos.y);
-  const rotatedOffset = new Vec2(
-    offset.x * Math.cos(bodyAngle) - offset.y * Math.sin(bodyAngle),
-    offset.x * Math.sin(bodyAngle) + offset.y * Math.cos(bodyAngle)
-  );
-
-  const offsetVertices = vertices.map((v) => {
-    return new Vec2(v.x + rotatedOffset.x, v.y + rotatedOffset.y);
+  const { x, y } = shouldRecenter ? center : Scene.mousePos; // center of fixture as defined by vertices
+  const roatedVertices = vertices.map((v) => {
+    return rotateVector(v, bodyAngle);
   });
+
+  const offset = new Vec2(x - bodyPos.x, y - bodyPos.y);
+
+  const rotatedOffset = rotateVector(offset, bodyAngle);
+
+  const offsetVertices = (shouldRecenter ? roatedVertices : vertices).map(
+    (v) => {
+      return new Vec2(v.x + rotatedOffset.x, v.y + rotatedOffset.y);
+    }
+  );
 
   const polygonShape = new pl.Polygon(
     Scene.isAddingFixture ? offsetVertices : vertices
@@ -159,30 +175,27 @@ const createFixtureAndAddToBody = (body, vertices) => {
 };
 
 const createPolylineShape = (world, points, shouldRecenter = false) => {
+  console.log("======================points", points);
   if (!world || points.length < 3) return;
   const mousePos = Scene.mousePos;
   const numPoints = points.length;
-  let centerOfMass = points.reduce(
-    (sum, point) => sum.add(point),
-    new Vec2(0, 0)
-  );
-  centerOfMass = new Vec2(
-    centerOfMass.x / numPoints,
-    centerOfMass.y / numPoints
-  );
+  let center = points.reduce((sum, point) => sum.add(point), new Vec2(0, 0));
+  center = new Vec2(center.x / numPoints, center.y / numPoints);
 
-  const reCenteredPoints = shouldRecenter
-    ? points.map((point) => point.sub(centerOfMass))
+  const reCalculatedPoints = shouldRecenter
+    ? points.map((point) => point.sub(center))
     : points;
 
   const body = world.createDynamicBody({
-    position: shouldRecenter ? centerOfMass : mousePos,
+    position: shouldRecenter ? center : mousePos,
     angularDamping: 0.5,
   });
 
   createFixtureAndAddToBody(
     Scene.isAddingFixture ? Scene.dragAndDrop.selectedBody : body,
-    reCenteredPoints
+    reCalculatedPoints,
+    center,
+    shouldRecenter
   );
 
   Scene.polylinePoints = [];
