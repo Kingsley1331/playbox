@@ -29,6 +29,7 @@ function Lab() {
   const [isBoxCreationMode, setIsBoxCreationMode] = useState(false);
   const [isPolylineMode, setIsPolylineMode] = useState(false);
   const [isCircleMode, setIsCircleMode] = useState(false);
+  const [isPolylineCircleMode, setIsPolylineCircleMode] = useState(false);
   const [fixtureList, setFixtureList] = useState([]);
   const [isAddingFixture, setIsAddingFixture] = useState(false);
 
@@ -50,6 +51,8 @@ function Lab() {
       setIsPolylineMode(true);
     } else if (mode === "circle") {
       setIsCircleMode(true);
+    } else if (mode === "polylineCircle") {
+      setIsPolylineCircleMode(true);
     } else if (mode === "box") {
       setIsBoxCreationMode(true);
     } else if (mode === "playing") {
@@ -337,6 +340,19 @@ function Lab() {
           {isPolylineMode
             ? `Creating Shape (${isPolylineMode} points)`
             : "Create Polyline Shape"}
+        </button>
+        <button
+          className={`px-4 py-2 rounded ${
+            isPolylineCircleMode
+              ? "bg-green-500 text-white"
+              : "bg-blue-500 text-white"
+          }`}
+          onClick={() => {
+            setIsPolylineCircleMode(!isPolylineCircleMode);
+            UpdateMode("polylineCircle");
+          }}
+        >
+          Create Polyline Circle
         </button>
         <button
           className={`px-4 py-2 rounded ${

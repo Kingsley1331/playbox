@@ -51,6 +51,15 @@ const dragShape = (e, rect, world) => {
   }
 };
 
+const makeNsidedPolygon = (world, n, radius) => {
+  const vertices = [];
+  for (let i = 0; i < n; i++) {
+    const angle = (2 * Math.PI * i) / n;
+    vertices.push(new Vec2(radius * Math.cos(angle), radius * Math.sin(angle)));
+  }
+  return createPolylineShape(world, vertices);
+};
+
 export const moveShape = (e, rect) => {
   if (Scene.dragAndThrow.mouseJoint) {
     const { x, y } = mousePosition(e, rect);
@@ -180,16 +189,13 @@ const createPolylineShape = (world, points, isCustomPolyline = false) => {
   const numPoints = points.length;
   let center = points.reduce((sum, point) => sum.add(point), new Vec2(0, 0));
   center = new Vec2(center.x / numPoints, center.y / numPoints);
-
   const reCalculatedPoints = isCustomPolyline
     ? points.map((point) => point.sub(center))
     : points;
-
   const body = world.createDynamicBody({
     position: isCustomPolyline ? center : mousePos,
     angularDamping: 0.5,
   });
-
   createFixtureAndAddToBody(
     Scene.isAddingFixture ? Scene.dragAndDrop.selectedBody : body,
     reCalculatedPoints,
@@ -205,6 +211,12 @@ const createPolylineShape = (world, points, isCustomPolyline = false) => {
 const createBox = (e, rect, world) => {
   if (Scene.mode !== "box" || !world) return;
   createPolylineShape(world, BOX_VERTICES);
+  render(world, { x: 0, y: 0 });
+};
+
+const createPolylineCircle = (e, rect, world) => {
+  if (Scene.mode !== "polylineCircle" || !world) return;
+  makeNsidedPolygon(world, 12, 0.5);
   render(world, { x: 0, y: 0 });
 };
 
@@ -264,6 +276,7 @@ export const click = (e, rect, world) => {
   }
   createBox(e, rect, world);
   createCircle(e, rect, world);
+  createPolylineCircle(e, rect, world);
   createPolyline(e, rect, world);
 };
 
@@ -284,7 +297,6 @@ export const doubleClick = (e, rect, world) => {
     world.queryAABB(aabb, (fixture) => {
       // Test if the point is actually inside this fixture
       if (fixture.testPoint(point)) {
-        console.log("======================fixture", fixture);
         Scene.dragAndDrop.selectedFixture = fixture;
         render(world, { x: 0, y: 0 });
         return true; // Stop querying after finding a match
@@ -296,7 +308,6 @@ export const doubleClick = (e, rect, world) => {
   }
 
   if (Scene.dragAndDrop.selectedFixture) {
-    console.log("======================deselecting fixture");
     Scene.dragAndDrop.selectedFixture = null;
   }
   render(world, { x: 0, y: 0 });
