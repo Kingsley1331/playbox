@@ -278,6 +278,7 @@ export const click = (e, rect, world) => {
   createCircle(e, rect, world);
   createPolygon(e, rect, world);
   createPolyline(e, rect, world);
+  console.log("mass", Scene.dragAndDrop.selectedBody.getMass());
 };
 
 export const doubleClick = (e, rect, world) => {
@@ -350,10 +351,9 @@ function scaleBody(body, originalFixtures, scale) {
       const vertices = shape.m_vertices;
       const originalVertices = originalShape.vertices;
 
-      for (let i = 0; i < vertices.length; i++) {
-        vertices[i].x = originalVertices[i].x * scale;
-        vertices[i].y = originalVertices[i].y * scale;
-      }
+      vertices.forEach((v, i) => {
+        v.set(originalVertices[i].x * scale, originalVertices[i].y * scale);
+      });
     } else if (isCircle) {
       shape.m_radius = originalShape.radius * scale;
       shape.m_p.x = originalShape.x * scale;
@@ -363,6 +363,7 @@ function scaleBody(body, originalFixtures, scale) {
     fixture = fixture.getNext();
     fixtureIndex++;
   }
+  body.resetMassData();
   render(Scene.world, { x: 0, y: 0 });
 }
 
@@ -543,6 +544,7 @@ export function mouseMove(e) {
         }
       }
     }
+    Scene.dragAndDrop.selectedBody.resetMassData();
     render(Scene.world, { x: 0, y: 0 });
   }
 
