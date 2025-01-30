@@ -29,15 +29,16 @@ function Lab() {
   const [isBoxCreationMode, setIsBoxCreationMode] = useState(false);
   const [isPolylineMode, setIsPolylineMode] = useState(false);
   const [isCircleMode, setIsCircleMode] = useState(false);
-  const [isPolylineCircleMode, setIsPolylineCircleMode] = useState(false);
+  const [isPolygonMode, setIsPolygonMode] = useState(false);
   const [fixtureList, setFixtureList] = useState([]);
   const [isAddingFixture, setIsAddingFixture] = useState(false);
-
+  const [polygonSides, setPolygonSides] = useState(3);
   const mousePos = Scene.mousePos;
 
   // TODO: turn into custom hook
   const UpdateMode = useCallback((mode) => {
     setIsPolylineMode(false);
+    setIsPolygonMode(false);
     setIsCircleMode(false);
     setIsBoxCreationMode(false);
     setIsPlaying(false);
@@ -51,8 +52,8 @@ function Lab() {
       setIsPolylineMode(true);
     } else if (mode === "circle") {
       setIsCircleMode(true);
-    } else if (mode === "polylineCircle") {
-      setIsPolylineCircleMode(true);
+    } else if (mode === "polygon") {
+      setIsPolygonMode(true);
     } else if (mode === "box") {
       setIsBoxCreationMode(true);
     } else if (mode === "playing") {
@@ -341,19 +342,37 @@ function Lab() {
             ? `Creating Shape (${isPolylineMode} points)`
             : "Create Polyline Shape"}
         </button>
-        <button
-          className={`px-4 py-2 rounded ${
-            isPolylineCircleMode
-              ? "bg-green-500 text-white"
-              : "bg-blue-500 text-white"
-          }`}
-          onClick={() => {
-            setIsPolylineCircleMode(!isPolylineCircleMode);
-            UpdateMode("polylineCircle");
-          }}
-        >
-          Create Polyline Circle
-        </button>
+        <div className="relative inline-block">
+          <button
+            className={`px-4 py-2 rounded ${
+              isPolygonMode
+                ? "bg-green-500 text-white"
+                : "bg-blue-500 text-white"
+            }`}
+            onClick={() => {
+              setIsPolygonMode(!isPolygonMode);
+              UpdateMode("polygon");
+            }}
+          >
+            Create Polygon ({polygonSides} sides)
+          </button>
+          {isPolygonMode && (
+            <div className="absolute z-10 mt-1 w-24 bg-white border border-gray-200 rounded shadow-lg">
+              {[3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((sides) => (
+                <button
+                  key={sides}
+                  className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+                  onClick={() => {
+                    setPolygonSides(sides);
+                    Scene.polygonSides = sides;
+                  }}
+                >
+                  {sides} sides
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         <button
           className={`px-4 py-2 rounded ${
             isAddingFixture

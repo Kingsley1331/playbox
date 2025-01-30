@@ -32,6 +32,8 @@ Scene.handlers = {
   doubleClick: null,
 };
 
+Scene.polygonSides = 3;
+
 // export function addFixture(fixture) {
 //   Scene.fixtures.push(fixture);
 //   //   Scene.fixtures = [...Scene.fixtures, { ...fixture }];

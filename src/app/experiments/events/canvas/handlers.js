@@ -214,9 +214,9 @@ const createBox = (e, rect, world) => {
   render(world, { x: 0, y: 0 });
 };
 
-const createPolylineCircle = (e, rect, world) => {
-  if (Scene.mode !== "polylineCircle" || !world) return;
-  makeNsidedPolygon(world, 12, 0.5);
+const createPolygon = (e, rect, world) => {
+  if (Scene.mode !== "polygon" || !world) return;
+  makeNsidedPolygon(world, Scene.polygonSides, 2);
   render(world, { x: 0, y: 0 });
 };
 
@@ -276,7 +276,7 @@ export const click = (e, rect, world) => {
   }
   createBox(e, rect, world);
   createCircle(e, rect, world);
-  createPolylineCircle(e, rect, world);
+  createPolygon(e, rect, world);
   createPolyline(e, rect, world);
 };
 
@@ -336,9 +336,17 @@ function scaleBody(body, originalFixtures, scale) {
 
   while (fixture) {
     const shape = fixture.getShape();
+    const isCircle = shape.getType() === "circle";
+    const isPolygon = shape.getType() === "polygon";
+    let circleShapeX = 0;
+    let circleShapeY = 0;
     const originalShape = originalFixtures[fixtureIndex];
+    if (isCircle) {
+      circleShapeX = shape.m_p.x;
+      circleShapeY = shape.m_p.y;
+    }
 
-    if (shape.getType() === "polygon") {
+    if (isPolygon) {
       const vertices = shape.m_vertices;
       const originalVertices = originalShape.vertices;
 
@@ -346,8 +354,10 @@ function scaleBody(body, originalFixtures, scale) {
         vertices[i].x = originalVertices[i].x * scale;
         vertices[i].y = originalVertices[i].y * scale;
       }
-    } else if (shape.getType() === "circle") {
+    } else if (isCircle) {
       shape.m_radius = originalShape.radius * scale;
+      // shape.m_p.set(shape.m_p.x * scale, shape.m_p.y * scale);
+      shape.m_p.set(circleShapeX * scale, circleShapeY * scale);
     }
 
     fixture = fixture.getNext();
