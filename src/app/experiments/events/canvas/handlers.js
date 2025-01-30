@@ -356,8 +356,8 @@ function scaleBody(body, originalFixtures, scale) {
       }
     } else if (isCircle) {
       shape.m_radius = originalShape.radius * scale;
-      // shape.m_p.set(shape.m_p.x * scale, shape.m_p.y * scale);
-      shape.m_p.set(circleShapeX * scale, circleShapeY * scale);
+      shape.m_p.x = originalShape.x * scale;
+      shape.m_p.y = originalShape.y * scale;
     }
 
     fixture = fixture.getNext();
@@ -478,6 +478,8 @@ export function mouseDown(e) {
             originalFixtures.push({
               type: "circle",
               radius: shape.m_radius,
+              x: shape.m_p.x,
+              y: shape.m_p.y,
             });
           }
           fixture = fixture.getNext();
