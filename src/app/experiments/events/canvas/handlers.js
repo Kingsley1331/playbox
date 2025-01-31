@@ -70,7 +70,7 @@ export const moveShape = (e, rect) => {
 const relocateShape = (x, y, world) => {
   const body = Scene.dragAndDrop.selectedBody;
   if (Scene.dragAndDrop.dragging && Scene.mode === "") {
-    if (body) {
+    if (body && !Scene.dragAndDrop.selectedFixture) {
       body.setPosition(new Vec2(x, y));
 
       if (isStaticBody(body)) {
@@ -101,6 +101,17 @@ const relocateShape = (x, y, world) => {
         body.setPosition({ x, y });
         body.setAwake(true);
       }
+    }
+    if (body && Scene.dragAndDrop.selectedFixture) {
+      console.log("dragging fixture", Scene.dragAndDrop.startMousePos);
+      moveFixtureRelativeToBody(
+        Scene.dragAndDrop.selectedFixture,
+        x - Scene.dragAndDrop.startMousePos.x,
+        y - Scene.dragAndDrop.startMousePos.y
+        // x - Scene.dragAndDrop.selectedBody.getPosition().x,
+        // x - Scene.dragAndDrop.selectedBody.getPosition().x,
+        // y - Scene.dragAndDrop.selectedBody.getPosition().y
+      );
     }
     render(world, { x: 0, y: 0 });
   }
@@ -402,6 +413,33 @@ function getWorldPoint(localX, localY, body) {
   };
 }
 
+function moveFixtureRelativeToBody(fixture, dx, dy) {
+  const shape = fixture.getShape();
+  const body = fixture.getBody();
+  const bodyPos = body.getPosition();
+  const { x, y } = Scene.mousePos;
+
+  if (shape.getType() === "circle") {
+    // For circles, adjust the local position (m_p)
+    shape.m_p.x += dx;
+    shape.m_p.y += dy;
+  } else if (shape.getType() === "polygon") {
+    // For polygons, translate all vertices
+    const vertices = shape.m_vertices;
+    for (let i = 0; i < vertices.length; i++) {
+      vertices[i].x = vertices[i].x + x - bodyPos.x;
+      vertices[i].y = vertices[i].y + y - bodyPos.y;
+      // vertices[i].x += dx / Scene.scale;
+      // vertices[i].y += dy / Scene.scale;
+      // vertices[i].x = vertices[i].x + dx;
+      // vertices[i].y = vertices[i].y + dy;
+    }
+  }
+
+  // Update mass data to reflect the new fixture position
+  fixture.getBody().resetMassData();
+}
+
 export function mouseDown(e) {
   const rect = Scene.canvas.element.getBoundingClientRect();
   const x = (e.clientX - rect.left) / Scene.scale;
@@ -429,7 +467,7 @@ export function mouseDown(e) {
           ) {
             Scene.vertexDragMode = {
               body: Scene.dragAndDrop.selectedBody,
-              fixture: fixture,
+              fixture,
               vertexIndex: i,
               originalVertices: vertices.map((v) => ({ x: v.x, y: v.y })),
             };
@@ -495,6 +533,9 @@ export function mouseDown(e) {
         };
       }
     }
+  }
+  if (Scene.dragAndDrop.selectedFixture) {
+    Scene.dragAndDrop.startMousePos = { x, y };
   }
   dragShape(e, rect, Scene.world);
   grabShape(e, rect, Scene.world);
@@ -618,4 +659,5 @@ export function mouseUp(e) {
 
   throwShape(Scene.world);
   releaseShape();
+  Scene.dragAndDrop.startMousePos = { x: 0, y: 0 };
 }
