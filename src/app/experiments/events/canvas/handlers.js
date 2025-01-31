@@ -103,15 +103,37 @@ const relocateShape = (x, y, world) => {
       }
     }
     if (body && Scene.dragAndDrop.selectedFixture) {
-      console.log("dragging fixture", Scene.dragAndDrop.startMousePos);
-      moveFixtureRelativeToBody(
-        Scene.dragAndDrop.selectedFixture,
-        x - Scene.dragAndDrop.startMousePos.x,
-        y - Scene.dragAndDrop.startMousePos.y
-        // x - Scene.dragAndDrop.selectedBody.getPosition().x,
-        // x - Scene.dragAndDrop.selectedBody.getPosition().x,
-        // y - Scene.dragAndDrop.selectedBody.getPosition().y
-      );
+      const bodyPos = body.getPosition();
+      const bodyAngle = -body.getAngle();
+
+      // Convert mouse position to body's local coordinates
+      const mouseOffset = new Vec2(x - bodyPos.x, y - bodyPos.y);
+      const localMousePos = rotateVector(mouseOffset, bodyAngle);
+
+      const shape = Scene.dragAndDrop.selectedFixture.getShape();
+
+      if (shape.getType() === "circle") {
+        shape.m_p.set(localMousePos.x, localMousePos.y);
+      } else if (shape.getType() === "polygon") {
+        // Calculate the center of the fixture
+        const vertices = shape.m_vertices;
+        const center = vertices
+          .reduce((sum, v) => sum.add(v), new Vec2(0, 0))
+          .mul(1 / vertices.length);
+
+        // Calculate the translation needed
+        const dx = localMousePos.x - center.x;
+        const dy = localMousePos.y - center.y;
+
+        // Move all vertices
+        for (let i = 0; i < vertices.length; i++) {
+          vertices[i].x += dx;
+          vertices[i].y += dy;
+        }
+      }
+
+      // Update mass properties
+      body.resetMassData();
     }
     render(world, { x: 0, y: 0 });
   }
@@ -297,33 +319,29 @@ export const doubleClick = (e, rect, world) => {
   const { x, y } = mousePosition(e, rect);
 
   if (!Scene.dragAndDrop.selectedFixture) {
-    // Get mouse position and query for fixture
     const point = new Vec2(x, y);
-
-    // Query all bodies in the area
     const aabb = new pl.AABB(
       new Vec2(x - 0.01, y - 0.01),
       new Vec2(x + 0.01, y + 0.01)
     );
 
     world.queryAABB(aabb, (fixture) => {
-      // Test if the point is actually inside this fixture
       if (fixture.testPoint(point)) {
         Scene.dragAndDrop.selectedFixture = fixture;
+        Scene.dragAndDrop.startMousePos = { x, y }; // Store initial mouse position
         render(world, { x: 0, y: 0 });
-        return true; // Stop querying after finding a match
+        return true;
       }
-      return false; // Continue searching if point not in this fixture
+      return false;
     });
-    render(world, { x: 0, y: 0 });
     return;
   }
 
   if (Scene.dragAndDrop.selectedFixture) {
     Scene.dragAndDrop.selectedFixture = null;
+    Scene.dragAndDrop.startMousePos = null; // Clear stored position
   }
   render(world, { x: 0, y: 0 });
-  return;
 };
 
 function isPointInCircle(px, py, cx, cy, radius) {
