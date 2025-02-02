@@ -160,6 +160,19 @@ export function drawBody(ctx, body) {
         });
       }
     }
+    //draw scene.rotationMode.center
+    if (Scene.rotationMode.status) {
+      ctx.fillStyle = "red";
+      ctx.beginPath();
+      ctx.arc(
+        Scene.rotationMode.center.x,
+        Scene.rotationMode.center.y,
+        0.3,
+        0,
+        2 * Math.PI
+      );
+      ctx.fill();
+    }
     ctx.restore();
   }
 
@@ -277,8 +290,8 @@ export const drawSelectedFixtureBoundingBox = (ctx, fixture, scale) => {
 
   const shape = fixture.getShape();
   const body = fixture.getBody();
-  const pos = body.getPosition();
-  const angle = body.getAngle();
+  const pos = body?.getPosition();
+  const angle = body?.getAngle();
 
   // Save current transform state
   ctx.save();
@@ -289,7 +302,7 @@ export const drawSelectedFixtureBoundingBox = (ctx, fixture, scale) => {
   ctx.setLineDash([5, 5]); // Create dashed line effect
 
   // Transform context to body's position and rotation
-  ctx.translate(pos.x * scale, -pos.y * scale);
+  ctx.translate(pos?.x * scale, -pos?.y * scale);
   ctx.rotate(-angle);
 
   // Draw based on shape type

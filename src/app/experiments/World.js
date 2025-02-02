@@ -61,4 +61,9 @@ Scene.resizeMode = null;
 
 Scene.vertexDragMode = null;
 
+Scene.rotationMode = {
+  center: { x: 70, y: 0 },
+  startAngle: 0,
+};
+
 export { Scene };
