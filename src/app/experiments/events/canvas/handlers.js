@@ -304,14 +304,13 @@ const createPolyline = (e, rect, world) => {
 };
 
 export const click = (e, rect, world) => {
-  if (Scene.rotationMode) {
+  if (Scene.rotationMode.status) {
     return;
   }
   createBox(e, rect, world);
   createCircle(e, rect, world);
   createPolygon(e, rect, world);
   createPolyline(e, rect, world);
-  // console.log("mass", Scene.dragAndDrop.selectedBody.getMass());
 };
 
 export const doubleClick = (e, rect, world) => {
@@ -506,12 +505,10 @@ export function mouseDown(e) {
     let centerOfFixture = new Vec2(0, 0);
 
     if (Scene.dragAndDrop.selectedFixture) {
-      console.log("selectedFixture", Scene.dragAndDrop.selectedFixture);
       localCenterOfFixture = getFixtureCenter(
         Scene.dragAndDrop.selectedFixture
       );
 
-      console.log({ bodyPosition, localCenterOfFixture });
       centerOfFixture = new Vec2(
         localCenterOfFixture.x + bodyPosition.x,
         localCenterOfFixture.y + bodyPosition.y
@@ -522,12 +519,7 @@ export function mouseDown(e) {
       ? centerOfFixture
       : bodyPosition;
 
-    // if (Scene.dragAndDrop.selectedFixture) {
-    //   console.log("selectedFixture m_p", Scene.dragAndDrop.selectedFixture);
-    // }
-
     if (isPointInCircle(x, y, handle.x, handle.y, handle.radius)) {
-      console.log("centerOfRotation", centerOfRotation);
       Scene.rotationMode = {
         status: true,
         body: Scene.dragAndDrop.selectedBody,
@@ -539,20 +531,6 @@ export function mouseDown(e) {
       };
     }
   }
-  // if (Scene.dragAndDrop.selectedFixture?.rotationHandle) {
-  //   const handle = Scene.dragAndDrop.selectedFixture.rotationHandle;
-  //   const fixtureCenter = Scene.dragAndDrop.selectedFixture.getShape().m_p;
-  //   console.log("fixtureCenter", fixtureCenter);
-  //   if (
-  //     isPointInCircle(x, y, fixtureCenter.x, fixtureCenter.y, handle.radius)
-  //   ) {
-  //     Scene.rotationMode = {
-  //       body: Scene.dragAndDrop.selectedFixture,
-  //       center: fixtureCenter,
-  //       startAngle: Math.atan2(y - fixtureCenter.y, x - fixtureCenter.x),
-  //     };
-  //   }
-  // }
 
   // Check if clicking resize handles
   if (Scene.dragAndDrop.selectedBody?.resizeHandles) {
@@ -617,7 +595,6 @@ const updateFixtureVertices = (body, fixture, newVertices) => {
 const getFixtureCenter = (fixture) => {
   const shape = fixture.getShape();
   const vertices = shape.m_vertices;
-  // console.log("vertices", vertices);
   return vertices
     .reduce((sum, v) => sum.add(v), new Vec2(0, 0))
     .mul(1 / vertices.length);
@@ -681,7 +658,6 @@ export function mouseMove(e, setMousePosUI) {
       x - Scene.rotationMode.center.x
     );
 
-    console.log("Rotation Mode center 1", Scene.rotationMode.center);
     const deltaAngle = currentAngle - Scene.rotationMode.startAngle;
     Scene.rotationMode.body.setAngle(
       Scene.rotationMode.body.getAngle() + deltaAngle
@@ -703,7 +679,6 @@ export function mouseMove(e, setMousePosUI) {
       x - Scene.rotationMode.center.x
     );
 
-    console.log("Rotation Mode center 2", Scene.rotationMode.center);
     const rotatedModeCenter = {
       x: Scene.rotationMode.center.x,
       y: Scene.rotationMode.center.y,
