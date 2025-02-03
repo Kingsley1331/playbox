@@ -297,19 +297,14 @@ const createRectangle = (e, rect, world) => {
   Scene.rectangle.startPoint = { x, y };
   createPolylineShape(world, [
     new Vec2(
-      Scene.rectangle.startPoint.x - x,
-      Scene.rectangle.startPoint.y - y
+      x - Scene.rectangle.startPoint.x,
+      y - Scene.rectangle.startPoint.y
     ),
-    new Vec2(Scene.rectangle.startPoint.x - x, Scene.rectangle.endPoint.y - y),
-    new Vec2(Scene.rectangle.endPoint.x - x, Scene.rectangle.endPoint.y - y),
-    new Vec2(Scene.rectangle.endPoint.x - x, Scene.rectangle.startPoint.y - y),
+    new Vec2(x - Scene.rectangle.startPoint.x, y - Scene.rectangle.endPoint.y),
+    new Vec2(x - Scene.rectangle.endPoint.x, y - Scene.rectangle.endPoint.y),
+    new Vec2(x - Scene.rectangle.endPoint.x, y - Scene.rectangle.startPoint.y),
   ]);
-  // createPolylineShape(world, [
-  //   new Vec2(Scene.rectangle.startPoint.x, Scene.rectangle.startPoint.y),
-  //   new Vec2(Scene.rectangle.startPoint.x, Scene.rectangle.endPoint.y),
-  //   new Vec2(Scene.rectangle.endPoint.x, Scene.rectangle.endPoint.y),
-  //   new Vec2(Scene.rectangle.endPoint.x, Scene.rectangle.startPoint.y),
-  // ]);
+
   render(world, { x: 0, y: 0 });
 };
 

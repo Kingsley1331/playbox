@@ -56,20 +56,25 @@ export function render(
       ctx.restore();
     }
     if (Scene.mode === "rectangle" && Scene.rectangle.status) {
-      console.log("Scene.rectangle", Scene.rectangle);
-      ctx.strokeStyle = "red";
+      ctx.save();
+      ctx.translate(translation.x, translation.y);
+      ctx.scale(scale, -scale);
+
+      ctx.strokeStyle = "black";
       ctx.lineWidth = 1 / scale;
       ctx.beginPath();
-      ctx.rect(
-        Scene.rectangle.startPoint.x,
-        Scene.rectangle.startPoint.y,
-        Scene.rectangle.endPoint.x - Scene.rectangle.startPoint.x,
-        Scene.rectangle.endPoint.y - Scene.rectangle.startPoint.y
-      );
-      // ctx.setLineDash([0.5, 0.5]);
+      ctx.setLineDash([0.5, 0.5]);
+
+      // Draw preview rectangle
+      ctx.moveTo(Scene.rectangle.startPoint.x, Scene.rectangle.startPoint.y);
+      ctx.lineTo(Scene.rectangle.startPoint.x, Scene.rectangle.endPoint.y);
+      ctx.lineTo(Scene.rectangle.endPoint.x, Scene.rectangle.endPoint.y);
+      ctx.lineTo(Scene.rectangle.endPoint.x, Scene.rectangle.startPoint.y);
+      ctx.closePath();
+
       ctx.stroke();
-      // ctx.setLineDash([]);
-      // ctx.restore();
+      ctx.setLineDash([]);
+      ctx.restore();
     }
 
     // Draw selection box if there's a selected fixture
