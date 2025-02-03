@@ -34,7 +34,7 @@ function Lab() {
   const [isAddingFixture, setIsAddingFixture] = useState(false);
   const [polygonSides, setPolygonSides] = useState(3);
   const [rectangleMode, setRectangleMode] = useState(false);
-  const mousePos = Scene.mousePos;
+  const [isDeleteMode, setIsDeleteMode] = useState(false);
 
   // TODO: turn into custom hook
   const UpdateMode = useCallback((mode) => {
@@ -44,6 +44,7 @@ function Lab() {
     setIsBoxCreationMode(false);
     setRectangleMode(false);
     setIsPlaying(false);
+    setIsDeleteMode(false);
     if (mode === Scene.mode) {
       Scene.mode = "";
       return;
@@ -62,6 +63,8 @@ function Lab() {
       setIsPlaying(true);
     } else if (mode === "rectangle") {
       setRectangleMode(true);
+    } else if (mode === "delete") {
+      setIsDeleteMode(true);
     }
   }, []);
 
@@ -387,6 +390,17 @@ function Lab() {
           }}
         >
           Rectangle Mode
+        </button>
+        <button
+          className={`px-4 py-2 rounded ${
+            isDeleteMode ? "bg-green-500 text-white" : "bg-blue-500 text-white"
+          }`}
+          onClick={() => {
+            UpdateMode("delete");
+            setIsDeleteMode(!isDeleteMode);
+          }}
+        >
+          Delete selected
         </button>
         <button
           className={`px-4 py-2 rounded ${

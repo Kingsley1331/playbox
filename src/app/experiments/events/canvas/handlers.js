@@ -453,6 +453,10 @@ export function mouseDown(e) {
   const x = (e.clientX - rect.left) / Scene.scale;
   const y = -(e.clientY - rect.top) / Scene.scale;
 
+  if (Scene.dragAndDrop.selectedBody) {
+    const fixtureCount = getFixtureCount(Scene.dragAndDrop.selectedBody);
+  }
+
   // Check if clicking a vertex of the selected body
   if (Scene.dragAndDrop.selectedBody) {
     const localPoint = getLocalPoint(x, y, Scene.dragAndDrop.selectedBody);
@@ -569,9 +573,41 @@ export function mouseDown(e) {
     Scene.rectangle.status = true;
     return;
   }
+  if (Scene.mode === "delete") {
+    deleteSelected(
+      Scene.dragAndDrop.selectedBody,
+      Scene.dragAndDrop.selectedFixture
+    );
+  }
+
   dragShape(e, rect, Scene.world);
   grabShape(e, rect, Scene.world);
 }
+
+const deleteSelected = (body, fixture) => {
+  if (Scene.mode === "delete") {
+    if (fixture) {
+      const fixtureCount = getFixtureCount(body);
+
+      body.destroyFixture(fixture);
+
+      console.log("Number of fixtures:", fixtureCount);
+      // Check if this was the last fixture
+      if (fixtureCount === 1) {
+        Scene.world.destroyBody(body);
+        Scene.dragAndDrop.selectedBody = null;
+        Scene.dragAndDrop.selectedFixture = null;
+      }
+
+      render(Scene.world, { x: 0, y: 0 });
+    } else if (body && !fixture) {
+      Scene.world.destroyBody(body);
+      Scene.dragAndDrop.selectedBody = null;
+      Scene.dragAndDrop.selectedFixture = null;
+    }
+    render(Scene.world, { x: 0, y: 0 });
+  }
+};
 
 const updateFixtureVertices = (body, fixture, newVertices) => {
   const fixtureProperties = {
@@ -797,4 +833,16 @@ export function mouseUp(e) {
   throwShape(Scene.world);
   releaseShape();
   Scene.dragAndDrop.startMousePos = { x: 0, y: 0 };
+}
+
+function getFixtureCount(body) {
+  let count = 0;
+  let fixture = body.getFixtureList();
+
+  while (fixture) {
+    count++;
+    fixture = fixture.getNext();
+  }
+
+  return count;
 }
