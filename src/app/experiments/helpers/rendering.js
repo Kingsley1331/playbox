@@ -55,6 +55,22 @@ export function render(
       ctx.setLineDash([]);
       ctx.restore();
     }
+    if (Scene.mode === "rectangle" && Scene.rectangle.status) {
+      console.log("Scene.rectangle", Scene.rectangle);
+      ctx.strokeStyle = "red";
+      ctx.lineWidth = 1 / scale;
+      ctx.beginPath();
+      ctx.rect(
+        Scene.rectangle.startPoint.x,
+        Scene.rectangle.startPoint.y,
+        Scene.rectangle.endPoint.x - Scene.rectangle.startPoint.x,
+        Scene.rectangle.endPoint.y - Scene.rectangle.startPoint.y
+      );
+      // ctx.setLineDash([0.5, 0.5]);
+      ctx.stroke();
+      // ctx.setLineDash([]);
+      // ctx.restore();
+    }
 
     // Draw selection box if there's a selected fixture
     if (Scene.dragAndDrop.selectedFixture) {

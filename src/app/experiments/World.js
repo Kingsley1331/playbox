@@ -11,6 +11,11 @@ Scene.world = world;
 Scene.scale = 20;
 // Scene.translation = { x: 0, y: 0 };
 Scene.polylinePoints = [];
+Scene.rectangle = {
+  status: false,
+  startPoint: { x: 0, y: 0 },
+  endPoint: { x: 0, y: 0 },
+};
 Scene.mousePos = { x: 0, y: 0 };
 // Scene.isPolylines = false;
 Scene.mode = "";

@@ -33,6 +33,7 @@ function Lab() {
   const [fixtureList, setFixtureList] = useState([]);
   const [isAddingFixture, setIsAddingFixture] = useState(false);
   const [polygonSides, setPolygonSides] = useState(3);
+  const [rectangleMode, setRectangleMode] = useState(false);
   const mousePos = Scene.mousePos;
 
   // TODO: turn into custom hook
@@ -41,6 +42,7 @@ function Lab() {
     setIsPolygonMode(false);
     setIsCircleMode(false);
     setIsBoxCreationMode(false);
+    setRectangleMode(false);
     setIsPlaying(false);
     if (mode === Scene.mode) {
       Scene.mode = "";
@@ -58,6 +60,8 @@ function Lab() {
       setIsBoxCreationMode(true);
     } else if (mode === "playing") {
       setIsPlaying(true);
+    } else if (mode === "rectangle") {
+      setRectangleMode(true);
     }
   }, []);
 
@@ -373,6 +377,17 @@ function Lab() {
             </div>
           )}
         </div>
+        <button
+          className={`px-4 py-2 rounded ${
+            rectangleMode ? "bg-green-500 text-white" : "bg-blue-500 text-white"
+          }`}
+          onClick={() => {
+            setRectangleMode(!rectangleMode);
+            UpdateMode("rectangle");
+          }}
+        >
+          Rectangle Mode
+        </button>
         <button
           className={`px-4 py-2 rounded ${
             isAddingFixture

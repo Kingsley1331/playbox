@@ -291,6 +291,28 @@ const createCircle = (e, rect, world) => {
   render(world, { x: 0, y: 0 });
 };
 
+const createRectangle = (e, rect, world) => {
+  if (Scene.mode !== "rectangle" || !world) return;
+  const { x, y } = mousePosition(e, rect);
+  Scene.rectangle.startPoint = { x, y };
+  createPolylineShape(world, [
+    new Vec2(
+      Scene.rectangle.startPoint.x - x,
+      Scene.rectangle.startPoint.y - y
+    ),
+    new Vec2(Scene.rectangle.startPoint.x - x, Scene.rectangle.endPoint.y - y),
+    new Vec2(Scene.rectangle.endPoint.x - x, Scene.rectangle.endPoint.y - y),
+    new Vec2(Scene.rectangle.endPoint.x - x, Scene.rectangle.startPoint.y - y),
+  ]);
+  // createPolylineShape(world, [
+  //   new Vec2(Scene.rectangle.startPoint.x, Scene.rectangle.startPoint.y),
+  //   new Vec2(Scene.rectangle.startPoint.x, Scene.rectangle.endPoint.y),
+  //   new Vec2(Scene.rectangle.endPoint.x, Scene.rectangle.endPoint.y),
+  //   new Vec2(Scene.rectangle.endPoint.x, Scene.rectangle.startPoint.y),
+  // ]);
+  render(world, { x: 0, y: 0 });
+};
+
 const renderPolylinePreview = (world) => {
   if (Scene.mode === "polyline") {
     render(world, { x: 0, y: 0 });
@@ -311,6 +333,7 @@ export const click = (e, rect, world) => {
   createCircle(e, rect, world);
   createPolygon(e, rect, world);
   createPolyline(e, rect, world);
+  createRectangle(e, rect, world);
 };
 
 export const doubleClick = (e, rect, world) => {
@@ -573,6 +596,11 @@ export function mouseDown(e) {
   if (Scene.dragAndDrop.selectedFixture) {
     Scene.dragAndDrop.startMousePos = { x, y };
   }
+  if (Scene.mode === "rectangle") {
+    Scene.rectangle.startPoint = { x, y };
+    Scene.rectangle.status = true;
+    return;
+  }
   dragShape(e, rect, Scene.world);
   grabShape(e, rect, Scene.world);
 }
@@ -748,6 +776,12 @@ export function mouseMove(e, setMousePosUI) {
     return;
   }
 
+  if (Scene.mode === "rectangle" && Scene.rectangle.status) {
+    Scene.rectangle.endPoint = { x, y };
+    render(Scene.world, { x: 0, y: 0 });
+    return;
+  }
+
   renderPolylinePreview(Scene.world);
   setMousePos(new Vec2(x, y));
   moveShape(e, rect);
@@ -771,6 +805,14 @@ export function mouseUp(e) {
 
   if (Scene.resizeMode) {
     Scene.resizeMode = null;
+    return;
+  }
+  if (Scene.mode === "rectangle") {
+    // const { x, y } = mousePosition(e, rect);
+    const { x, y } = Scene.mousePos;
+    Scene.rectangle.endPoint = { x, y };
+    console.log("Scene.rectangle.endPoint", Scene.rectangle.endPoint);
+    Scene.rectangle.status = false;
     return;
   }
 
