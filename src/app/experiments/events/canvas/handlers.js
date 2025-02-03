@@ -191,7 +191,7 @@ const createFixtureAndAddToBody = (
   const bodyPos = body.getPosition();
   const bodyAngle = -body.getAngle();
   const { x, y } = isCustomPolyline ? center : Scene.mousePos; // center of fixture as defined by vertices
-  const roatedVertices = vertices.map((v) => {
+  const rotatedVertices = vertices.map((v) => {
     return rotateVector(v, bodyAngle);
   });
 
@@ -199,7 +199,7 @@ const createFixtureAndAddToBody = (
 
   const rotatedOffset = rotateVector(offset, bodyAngle);
 
-  const offsetVertices = (isCustomPolyline ? roatedVertices : vertices).map(
+  const offsetVertices = (isCustomPolyline ? rotatedVertices : vertices).map(
     (v) => {
       return new Vec2(v.x + rotatedOffset.x, v.y + rotatedOffset.y);
     }
@@ -448,33 +448,6 @@ function getWorldPoint(localX, localY, body) {
   };
 }
 
-function moveFixtureRelativeToBody(fixture, dx, dy) {
-  const shape = fixture.getShape();
-  const body = fixture.getBody();
-  const bodyPos = body.getPosition();
-  const { x, y } = Scene.mousePos;
-
-  if (shape.getType() === "circle") {
-    // For circles, adjust the local position (m_p)
-    shape.m_p.x += dx;
-    shape.m_p.y += dy;
-  } else if (shape.getType() === "polygon") {
-    // For polygons, translate all vertices
-    const vertices = shape.m_vertices;
-    for (let i = 0; i < vertices.length; i++) {
-      vertices[i].x = vertices[i].x + x - bodyPos.x;
-      vertices[i].y = vertices[i].y + y - bodyPos.y;
-      // vertices[i].x += dx / Scene.scale;
-      // vertices[i].y += dy / Scene.scale;
-      // vertices[i].x = vertices[i].x + dx;
-      // vertices[i].y = vertices[i].y + dy;
-    }
-  }
-
-  // Update mass data to reflect the new fixture position
-  fixture.getBody().resetMassData();
-}
-
 export function mouseDown(e) {
   const rect = Scene.canvas.element.getBoundingClientRect();
   const x = (e.clientX - rect.left) / Scene.scale;
@@ -714,6 +687,19 @@ export function mouseMove(e, setMousePosUI) {
       rotatedModeCenter.y - bodyPosition.y
     );
     const deltaAngle = currentAngle - Scene.rotationMode.startAngle;
+
+    /** 
+     General approach to rotating vertices around the center of a fixture
+      - In order to rotate the vertices around the fixture center, we need to 
+        - translate the vertices to the body center 
+        - rotate them
+        - and then translate them back to the fixture center
+      - To do this we first have to find the offset which is the vector from the center of the fixture (rotatedModeCenter) to the center of the body (bodyPosition) - both rotatedModeCenter and bodyPosition are global coordinate vectors
+      - We then need to subtract the offset from each vertex to get the local coordinates
+      - We rotate the now offset vertices with rotateVector
+      - lastly we add the offset back to get the fixture back to its original position
+    **/
+
     const rotatedVertices = vertices
       .map((v) => {
         return rotateVector(
@@ -730,10 +716,7 @@ export function mouseMove(e, setMousePosUI) {
       fixture,
       rotatedVertices
     );
-    // Scene.rotationMode.fixture.setAngle(
-    //   Scene.rotationMode.fixture.getAngle() + deltaAngle
-    // );
-    // Scene.dragAndDrop.selectedBody.resetMassData();
+
     Scene.rotationMode.startAngle = currentAngle;
     render(Scene.world, { x: 0, y: 0 });
   }
