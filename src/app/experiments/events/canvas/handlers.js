@@ -360,11 +360,11 @@ const changeBodyType = (e, rect, world, action) => {
 
 const cloneBody = (e, rect, world) => {
   if (Scene.mode !== "clone" || !world) return;
-  if (!Scene.clone && Scene.dragAndDrop.selectedBody) {
-    Scene.clone = Scene.dragAndDrop.selectedBody;
+  if (!Scene.clone.body && Scene.dragAndDrop.selectedBody) {
+    Scene.clone.body = Scene.dragAndDrop.selectedBody;
   } else {
     const { x, y } = mousePosition(e, rect);
-    const body = Scene.clone;
+    const body = Scene.clone.body;
     if (!body) return;
 
     // Create new body with same type and position
@@ -389,8 +389,7 @@ const cloneBody = (e, rect, world) => {
     newBody.setLinearVelocity(body.getLinearVelocity());
     newBody.setAngularVelocity(body.getAngularVelocity());
     newBody.setUserData(body.getUserData());
-    // Scene.clone = newBody;
-    Scene.clone = null;
+    Scene.clone.body = null;
     render(world, { x: 0, y: 0 });
   }
   // Scene.clone = null;
