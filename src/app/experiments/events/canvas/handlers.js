@@ -395,6 +395,29 @@ const cloneBody = (e, rect, world) => {
   // Scene.clone = null;
 };
 
+const cloneFixture = (e, rect, world, body) => {
+  if (Scene.mode !== "clone" || !world) return;
+  if (!Scene.clone.fixture && Scene.dragAndDrop.selectedFixture) {
+    Scene.clone.fixture = Scene.dragAndDrop.selectedFixture;
+  }
+  const { x, y } = mousePosition(e, rect);
+
+  const fixture = Scene.clone.fixture;
+
+  if (!fixture) return;
+  // shift fixture position by offset vector
+  const shape = fixture.getShape();
+  const density = fixture.getDensity();
+  const friction = fixture.getFriction();
+  const restitution = fixture.getRestitution();
+
+  body.createFixture(shape, {
+    density: density,
+    friction: friction,
+    restitution: restitution,
+  });
+};
+
 export const click = (e, rect, world) => {
   if (Scene.rotationMode.status) {
     return;
@@ -407,8 +430,16 @@ export const click = (e, rect, world) => {
     changeBodyType(e, rect, world, "makeDynamic");
   }
 
-  if (Scene.mode === "clone") {
+  if (
+    Scene.mode === "clone" &&
+    Scene.dragAndDrop.selectedBody &&
+    !Scene.dragAndDrop.selectedFixture
+  ) {
     cloneBody(e, rect, world);
+  }
+  if (Scene.mode === "clone" && Scene.dragAndDrop.selectedFixture) {
+    console.log("cloneFixture");
+    cloneFixture(e, rect, world, Scene.dragAndDrop.selectedBody);
   }
 
   createBox(e, rect, world);
