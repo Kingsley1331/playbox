@@ -26,7 +26,8 @@ function Lab() {
   const carRef = useRef(null);
   const boxRef = useRef(null);
   const boxRef2 = useRef(null);
-  const [isMakingStatic, setIsMakingDynamic] = useState(false);
+  const [isMakingStatic, setIsMakingStatic] = useState(false);
+  const [isMakingDynamic, setIsMakingDynamic] = useState(false);
   const [isBoxCreationMode, setIsBoxCreationMode] = useState(false);
   const [isPolylineMode, setIsPolylineMode] = useState(false);
   const [isCircleMode, setIsCircleMode] = useState(false);
@@ -47,6 +48,7 @@ function Lab() {
     setIsPlaying(false);
     setIsDeleteMode(false);
     setIsMakingDynamic(false);
+    setIsMakingStatic(false);
     if (mode === Scene.mode) {
       Scene.mode = "";
       return;
@@ -68,6 +70,8 @@ function Lab() {
     } else if (mode === "delete") {
       setIsDeleteMode(true);
     } else if (mode === "makeStatic") {
+      setIsMakingStatic(true);
+    } else if (mode === "makeDynamic") {
       setIsMakingDynamic(true);
     }
   }, []);
@@ -414,11 +418,24 @@ function Lab() {
               : "bg-blue-500 text-white"
           }`}
           onClick={() => {
-            setIsMakingDynamic(!isMakingStatic);
+            setIsMakingStatic(!isMakingStatic);
             UpdateMode("makeStatic");
           }}
         >
           Make static
+        </button>
+        <button
+          className={`px-4 py-2 rounded ${
+            isMakingDynamic
+              ? "bg-green-500 text-white"
+              : "bg-blue-500 text-white"
+          }`}
+          onClick={() => {
+            setIsMakingDynamic(!isMakingDynamic);
+            UpdateMode("makeDynamic");
+          }}
+        >
+          Make dynamic
         </button>
 
         <button

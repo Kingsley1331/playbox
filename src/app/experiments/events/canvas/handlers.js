@@ -320,14 +320,8 @@ const createPolyline = (e, rect, world) => {
   Scene.polylinePoints = [...Scene.polylinePoints, new Vec2(x, y)];
 };
 
-export const click = (e, rect, world) => {
-  if (Scene.rotationMode.status) {
-    return;
-  }
-
-  // Add this new condition for static mode
-  if (Scene.mode === "makeStatic") {
-    console.log("isStaticBody");
+const changeBodyType = (e, rect, world, action) => {
+  if (Scene.mode === "makeStatic" || Scene.mode === "makeDynamic") {
     const { x, y } = mousePosition(e, rect);
     const aabb = new pl.AABB(
       new Vec2(x - 0.01, y - 0.01),
@@ -336,36 +330,45 @@ export const click = (e, rect, world) => {
 
     world.queryAABB(aabb, (fixture) => {
       const body = fixture.getBody();
-      if (!isStaticBody(body)) {
-        // Store the body's properties
-        let fixtures = body.getFixtureList();
-        const userData = body.getUserData();
-        const position = body.getPosition();
-        const angle = body.getAngle();
+      let fixtures = body.getFixtureList();
+      const userData = body.getUserData();
+      const position = body.getPosition();
+      const angle = body.getAngle();
 
-        // Destroy old body
-        world.destroyBody(body);
+      // Destroy old body
+      world.destroyBody(body);
 
-        // Create new static body with same properties
-        const newBody = world.createBody({
-          type: "static",
-          position: position,
-          angle: angle,
-        });
+      // Create new static body with same properties
+      const newBody = world.createBody({
+        type: action === "makeStatic" ? "static" : "dynamic",
+        position: position,
+        angle: angle,
+      });
 
-        // Transfer fixtures and data
-        while (fixtures) {
-          newBody.createFixture(fixtures.getShape(), fixtures.getDensity());
-          fixtures = fixtures.getNext();
-        }
-        newBody.setUserData(userData);
+      // Transfer fixtures and data
+      while (fixtures) {
+        newBody.createFixture(fixtures.getShape(), fixtures.getDensity());
+        fixtures = fixtures.getNext();
       }
+      newBody.setUserData(userData);
       return false;
     });
     render(world, { x: 0, y: 0 });
     return;
   }
+};
 
+export const click = (e, rect, world) => {
+  if (Scene.rotationMode.status) {
+    return;
+  }
+
+  // Add this new condition for static mode
+  if (Scene.mode === "makeStatic") {
+    changeBodyType(e, rect, world, "makeStatic");
+  } else if (Scene.mode === "makeDynamic") {
+    changeBodyType(e, rect, world, "makeDynamic");
+  }
   createBox(e, rect, world);
   createCircle(e, rect, world);
   createPolygon(e, rect, world);
