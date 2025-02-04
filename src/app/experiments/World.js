@@ -71,4 +71,6 @@ Scene.rotationMode = {
   startAngle: 0,
 };
 
+Scene.clone = null;
+
 export { Scene };

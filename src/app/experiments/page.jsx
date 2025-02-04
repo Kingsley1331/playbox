@@ -37,6 +37,7 @@ function Lab() {
   const [polygonSides, setPolygonSides] = useState(3);
   const [rectangleMode, setRectangleMode] = useState(false);
   const [isDeleteMode, setIsDeleteMode] = useState(false);
+  const [isCloning, setIsCloning] = useState(false);
 
   // TODO: turn into custom hook
   const UpdateMode = useCallback((mode) => {
@@ -49,6 +50,7 @@ function Lab() {
     setIsDeleteMode(false);
     setIsMakingDynamic(false);
     setIsMakingStatic(false);
+    setIsCloning(false);
     if (mode === Scene.mode) {
       Scene.mode = "";
       return;
@@ -73,6 +75,8 @@ function Lab() {
       setIsMakingStatic(true);
     } else if (mode === "makeDynamic") {
       setIsMakingDynamic(true);
+    } else if (mode === "clone") {
+      setIsCloning(true);
     }
   }, []);
 
@@ -436,6 +440,17 @@ function Lab() {
           }}
         >
           Make dynamic
+        </button>
+        <button
+          className={`px-4 py-2 rounded ${
+            isCloning ? "bg-green-500 text-white" : "bg-blue-500 text-white"
+          }`}
+          onClick={() => {
+            setIsCloning(!isCloning);
+            UpdateMode("clone");
+          }}
+        >
+          Clone selected
         </button>
 
         <button

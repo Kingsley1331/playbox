@@ -358,6 +358,44 @@ const changeBodyType = (e, rect, world, action) => {
   }
 };
 
+const cloneBody = (e, rect, world) => {
+  if (Scene.mode !== "clone" || !world) return;
+  if (!Scene.clone && Scene.dragAndDrop.selectedBody) {
+    Scene.clone = Scene.dragAndDrop.selectedBody;
+  } else {
+    const { x, y } = mousePosition(e, rect);
+    const body = Scene.clone;
+    if (!body) return;
+
+    // Create new body with same type and position
+    const newBody = world.createBody({
+      type: body.getType(),
+      position: new Vec2(x, y),
+      angle: body.getAngle(),
+    });
+
+    // Copy all fixtures
+    let fixture = body.getFixtureList();
+    while (fixture) {
+      newBody.createFixture(fixture.getShape(), {
+        density: fixture.getDensity(),
+        friction: fixture.getFriction(),
+        restitution: fixture.getRestitution(),
+      });
+      fixture = fixture.getNext();
+    }
+
+    // Copy other properties
+    newBody.setLinearVelocity(body.getLinearVelocity());
+    newBody.setAngularVelocity(body.getAngularVelocity());
+    newBody.setUserData(body.getUserData());
+    // Scene.clone = newBody;
+    Scene.clone = null;
+    render(world, { x: 0, y: 0 });
+  }
+  // Scene.clone = null;
+};
+
 export const click = (e, rect, world) => {
   if (Scene.rotationMode.status) {
     return;
@@ -369,6 +407,11 @@ export const click = (e, rect, world) => {
   } else if (Scene.mode === "makeDynamic") {
     changeBodyType(e, rect, world, "makeDynamic");
   }
+
+  if (Scene.mode === "clone") {
+    cloneBody(e, rect, world);
+  }
+
   createBox(e, rect, world);
   createCircle(e, rect, world);
   createPolygon(e, rect, world);
