@@ -422,14 +422,14 @@ const cloneFixture = (e, rect, world, body) => {
     const density = fixture.getDensity();
     const friction = fixture.getFriction();
     const restitution = fixture.getRestitution();
-    console.log("shape type", shape.m_type);
-    const isCircle = shape.m_type === "circle";
-    if (isCircle) {
+
+    if (shape.m_type === "circle") {
       const circleShape = new pl.Circle(shape.m_radius);
-      console.log("circleShape", circleShape);
-      const circleShapeX = shape.m_p.x;
-      const circleShapeY = shape.m_p.y;
-      circleShape.m_p.set(circleShapeX + offset.x, circleShapeY + offset.y);
+      const circlePosition = new Vec2(
+        shape.m_p.x + offset.x,
+        shape.m_p.y + offset.y
+      );
+      circleShape.m_p.set(circlePosition.x, circlePosition.y);
 
       body.createFixture({
         shape: circleShape,
@@ -437,7 +437,7 @@ const cloneFixture = (e, rect, world, body) => {
         friction,
         restitution,
       });
-    } else {
+    } else if (shape.m_type === "polygon") {
       const polygonShape = new pl.Polygon(
         shape.m_vertices.map((v) => {
           return new Vec2(v.x + offset.x, v.y + offset.y);
