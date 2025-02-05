@@ -376,6 +376,7 @@ const cloneBody = (e, rect, world) => {
 
     // Copy all fixtures
     let fixture = body.getFixtureList();
+
     while (fixture) {
       newBody.createFixture(fixture.getShape(), {
         density: fixture.getDensity(),
@@ -566,6 +567,26 @@ function scaleBody(body, originalFixtures, scale) {
   body.resetMassData();
   render(Scene.world, { x: 0, y: 0 });
 }
+
+const scaleFixture = (fixture, scale) => {
+  const shape = fixture.getShape();
+  const isCircle = shape.getType() === "circle";
+  const isPolygon = shape.getType() === "polygon";
+  if (isCircle) {
+    shape.m_radius = shape.m_radius * scale;
+    shape.m_p.x = shape.m_p.x * scale;
+    shape.m_p.y = shape.m_p.y * scale;
+  }
+  if (isPolygon) {
+    // const originalShape = shape;
+    const vertices = shape.m_vertices;
+    const originalVertices = vertices;
+    vertices.forEach((v, i) => {
+      v.set(originalVertices[i].x * scale, originalVertices[i].y * scale);
+    });
+  }
+  return fixture;
+};
 
 function isPointNearVertex(px, py, vx, vy, threshold = 0.2) {
   const dx = px - vx;
@@ -921,6 +942,7 @@ export function mouseMove(e, setMousePosUI) {
     const aabb = Scene.resizeMode.originalAABB;
     const width = aabb.upperBound.x - aabb.lowerBound.x;
     const height = aabb.upperBound.y - aabb.lowerBound.y;
+    console.log("aabb", aabb);
 
     // Calculate diagonal distance for uniform scaling
     const originalDiagonal = Math.sqrt(width * width + height * height);
@@ -940,14 +962,24 @@ export function mouseMove(e, setMousePosUI) {
     // Calculate uniform scale factor
     const scaleFactor = Math.max(0.1, newDiagonal / originalDiagonal);
 
-    scaleBody(
-      Scene.resizeMode.body,
-      Scene.resizeMode.originalFixtures,
-      scaleFactor
-    );
-    return;
-  }
+    if (Scene.dragAndDrop.selectedBody && !Scene.dragAndDrop.selectedFixture) {
+      scaleBody(
+        Scene.resizeMode.body,
+        Scene.resizeMode.originalFixtures,
+        scaleFactor
+      );
+    }
 
+    if (Scene.dragAndDrop.selectedFixture) {
+      const fixture = Scene.dragAndDrop.selectedFixture;
+      const vertices = fixture.getShape().m_vertices;
+      const fixtureCenter = getFixtureCenter(fixture);
+      const currentAngle = Math.atan2(y - fixtureCenter.y, x - fixtureCenter.x);
+      const deltaAngle = currentAngle - Scene.rotationMode.startAngle;
+      scaleFixture(fixture, scaleFactor);
+      render(Scene.world, { x: 0, y: 0 });
+    }
+  }
   if (Scene.mode === "rectangle" && Scene.rectangle.status) {
     Scene.rectangle.endPoint = { x, y };
     render(Scene.world, { x: 0, y: 0 });
