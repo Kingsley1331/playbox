@@ -1,7 +1,7 @@
 import planck, { Vec2 } from "planck";
 import { Scene } from "../../World";
 import { mousePosition, setMousePos } from "../../helpers/utilities";
-import { render, getBodyAABB } from "../../helpers/rendering";
+import { render, getBodyAABB, getFixtureAABB } from "../../helpers/rendering";
 
 const pl = planck;
 
@@ -578,11 +578,10 @@ const scaleFixture = (fixture, scale) => {
     shape.m_p.y = shape.m_p.y * scale;
   }
   if (isPolygon) {
-    // const originalShape = shape;
-    const vertices = shape.m_vertices;
-    const originalVertices = vertices;
-    vertices.forEach((v, i) => {
-      v.set(originalVertices[i].x * scale, originalVertices[i].y * scale);
+    const referenceVertices = Scene.resizeMode.selectedFixtureVertices;
+    const originalVertices = shape.m_vertices;
+    originalVertices.forEach((v, i) => {
+      v.set(referenceVertices[i].x * scale, referenceVertices[i].y * scale);
     });
   }
   return fixture;
@@ -704,6 +703,7 @@ export function mouseDown(e) {
 
   // Check if clicking resize handles
   if (Scene.dragAndDrop.selectedBody?.resizeHandles) {
+    const hasSelectedFixture = !!Scene.dragAndDrop.selectedFixture;
     for (const [position, handle] of Object.entries(
       Scene.dragAndDrop.selectedBody.resizeHandles
     )) {
@@ -729,13 +729,25 @@ export function mouseDown(e) {
           }
           fixture = fixture.getNext();
         }
+        const selectedFixtureVertices = hasSelectedFixture
+          ? {
+              ...Scene.dragAndDrop.selectedFixture
+                .getShape()
+                .m_vertices.map((v) => {
+                  return { x: v.x, y: v.y };
+                }),
+            }
+          : null;
 
         Scene.resizeMode = {
           body: Scene.dragAndDrop.selectedBody,
           handle: position,
           startPoint: { x, y },
           originalFixtures,
-          originalAABB: getBodyAABB(Scene.dragAndDrop.selectedBody),
+          selectedFixtureVertices,
+          originalAABB: hasSelectedFixture
+            ? getFixtureAABB(Scene.dragAndDrop.selectedFixture)
+            : getBodyAABB(Scene.dragAndDrop.selectedBody),
         };
       }
     }
