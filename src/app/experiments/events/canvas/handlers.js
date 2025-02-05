@@ -399,23 +399,34 @@ const cloneFixture = (e, rect, world, body) => {
   if (Scene.mode !== "clone" || !world) return;
   if (!Scene.clone.fixture && Scene.dragAndDrop.selectedFixture) {
     Scene.clone.fixture = Scene.dragAndDrop.selectedFixture;
+  } else {
+    const { x, y } = mousePosition(e, rect);
+
+    const localPoint = getLocalPoint(x, y, body);
+
+    const fixture = Scene.clone.fixture;
+
+    if (!fixture) return;
+    // shift fixture position by offset vector
+    const shape = { ...fixture.getShape() };
+    const density = fixture.getDensity();
+    const friction = fixture.getFriction();
+    const restitution = fixture.getRestitution();
+
+    const polygonShape = new pl.Polygon(
+      shape.m_vertices.map((v) => {
+        return new Vec2(v.x + localPoint.x, v.y + localPoint.y);
+      })
+    );
+
+    body.createFixture(polygonShape, {
+      density,
+      friction,
+      restitution,
+    });
+    Scene.clone.fixture = null;
+    render(world, { x: 0, y: 0 });
   }
-  const { x, y } = mousePosition(e, rect);
-
-  const fixture = Scene.clone.fixture;
-
-  if (!fixture) return;
-  // shift fixture position by offset vector
-  const shape = fixture.getShape();
-  const density = fixture.getDensity();
-  const friction = fixture.getFriction();
-  const restitution = fixture.getRestitution();
-
-  body.createFixture(shape, {
-    density: density,
-    friction: friction,
-    restitution: restitution,
-  });
 };
 
 export const click = (e, rect, world) => {
