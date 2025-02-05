@@ -422,18 +422,33 @@ const cloneFixture = (e, rect, world, body) => {
     const density = fixture.getDensity();
     const friction = fixture.getFriction();
     const restitution = fixture.getRestitution();
+    console.log("shape type", shape.m_type);
+    const isCircle = shape.m_type === "circle";
+    if (isCircle) {
+      const circleShape = new pl.Circle(shape.m_radius);
+      console.log("circleShape", circleShape);
+      const circleShapeX = shape.m_p.x;
+      const circleShapeY = shape.m_p.y;
+      circleShape.m_p.set(circleShapeX + offset.x, circleShapeY + offset.y);
 
-    const polygonShape = new pl.Polygon(
-      shape.m_vertices.map((v) => {
-        return new Vec2(v.x + offset.x, v.y + offset.y);
-      })
-    );
-
-    body.createFixture(polygonShape, {
-      density,
-      friction,
-      restitution,
-    });
+      body.createFixture({
+        shape: circleShape,
+        density,
+        friction,
+        restitution,
+      });
+    } else {
+      const polygonShape = new pl.Polygon(
+        shape.m_vertices.map((v) => {
+          return new Vec2(v.x + offset.x, v.y + offset.y);
+        })
+      );
+      body.createFixture(polygonShape, {
+        density,
+        friction,
+        restitution,
+      });
+    }
     Scene.clone.fixture = null;
     render(world, { x: 0, y: 0 });
   }
@@ -764,6 +779,10 @@ const updateFixtureVertices = (body, fixture, newVertices) => {
 };
 
 const getFixtureCenter = (fixture) => {
+  const isCircle = fixture.getShape().getType() === "circle";
+  if (isCircle) {
+    return fixture.getShape().m_p;
+  }
   const shape = fixture.getShape();
   const vertices = shape.m_vertices;
   return vertices
