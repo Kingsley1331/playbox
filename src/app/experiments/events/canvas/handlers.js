@@ -402,11 +402,21 @@ const cloneFixture = (e, rect, world, body) => {
   } else {
     const { x, y } = mousePosition(e, rect);
 
-    const localPoint = getLocalPoint(x, y, body);
+    const localMousePoint = getLocalPoint(x, y, body);
 
     const fixture = Scene.clone.fixture;
 
     if (!fixture) return;
+
+    const fixtureCenter = getFixtureCenter(fixture);
+    console.log("fixtureCenter", fixtureCenter);
+
+    const offset = new Vec2(
+      localMousePoint.x - fixtureCenter.x,
+      localMousePoint.y - fixtureCenter.y
+    );
+    console.log("offset", offset);
+
     // shift fixture position by offset vector
     const shape = { ...fixture.getShape() };
     const density = fixture.getDensity();
@@ -415,7 +425,7 @@ const cloneFixture = (e, rect, world, body) => {
 
     const polygonShape = new pl.Polygon(
       shape.m_vertices.map((v) => {
-        return new Vec2(v.x + localPoint.x, v.y + localPoint.y);
+        return new Vec2(v.x + offset.x, v.y + offset.y);
       })
     );
 
