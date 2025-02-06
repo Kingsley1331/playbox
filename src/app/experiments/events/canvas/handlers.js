@@ -1,4 +1,5 @@
 import planck, { Vec2 } from "planck";
+import _ from "lodash";
 import { Scene } from "../../World";
 import { mousePosition, setMousePos } from "../../helpers/utilities";
 import { render, getBodyAABB, getFixtureAABB } from "../../helpers/rendering";
@@ -378,10 +379,15 @@ const cloneBody = (e, rect, world) => {
     let fixture = body.getFixtureList();
 
     while (fixture) {
-      newBody.createFixture(fixture.getShape(), {
-        density: fixture.getDensity(),
-        friction: fixture.getFriction(),
-        restitution: fixture.getRestitution(),
+      const shape = _.cloneDeep(fixture.getShape());
+      const density = _.cloneDeep(fixture.getDensity());
+      const friction = _.cloneDeep(fixture.getFriction());
+      const restitution = _.cloneDeep(fixture.getRestitution());
+
+      newBody.createFixture(shape, {
+        density,
+        friction,
+        restitution,
       });
       fixture = fixture.getNext();
     }
@@ -988,7 +994,6 @@ export function mouseMove(e, setMousePosUI) {
     const aabb = Scene.resizeMode.originalAABB;
     const width = aabb.upperBound.x - aabb.lowerBound.x;
     const height = aabb.upperBound.y - aabb.lowerBound.y;
-    console.log("aabb", aabb);
 
     // Calculate diagonal distance for uniform scaling
     const originalDiagonal = Math.sqrt(width * width + height * height);
