@@ -572,15 +572,14 @@ const scaleFixture = (fixture, scale) => {
   const shape = fixture.getShape();
   const isCircle = shape.getType() === "circle";
   const isPolygon = shape.getType() === "polygon";
+  const selectedFixture = Scene.resizeMode.selectedFixture;
   if (isCircle) {
-    shape.m_radius = shape.m_radius * scale;
-    shape.m_p.x = shape.m_p.x * scale;
-    shape.m_p.y = shape.m_p.y * scale;
+    shape.m_radius = selectedFixture.radius * scale;
   }
   if (isPolygon) {
-    const referenceVertices = Scene.resizeMode.selectedFixtureVertices;
-    const originalVertices = shape.m_vertices;
-    originalVertices.forEach((v, i) => {
+    const referenceVertices = Scene.resizeMode.selectedFixture.vertices;
+    const vertices = shape.m_vertices;
+    vertices.forEach((v, i) => {
       v.set(referenceVertices[i].x * scale, referenceVertices[i].y * scale);
     });
   }
@@ -729,22 +728,43 @@ export function mouseDown(e) {
           }
           fixture = fixture.getNext();
         }
-        const selectedFixtureVertices = hasSelectedFixture
-          ? {
-              ...Scene.dragAndDrop.selectedFixture
-                .getShape()
-                .m_vertices.map((v) => {
+        const selectedFixtureShape = hasSelectedFixture
+          ? Scene.dragAndDrop.selectedFixture.getShape()
+          : null;
+
+        const selectedFixtureType = hasSelectedFixture
+          ? selectedFixtureShape.getType()
+          : null;
+
+        const selectedFixtureVertices =
+          hasSelectedFixture && selectedFixtureType === "polygon"
+            ? {
+                ...selectedFixtureShape.m_vertices.map((v) => {
                   return { x: v.x, y: v.y };
                 }),
-            }
+              }
+            : null;
+
+        const selectedFixtureCenter = hasSelectedFixture
+          ? getFixtureCenter(Scene.dragAndDrop.selectedFixture)
           : null;
+
+        const selectedFixtureRadius =
+          hasSelectedFixture && selectedFixtureType === "circle"
+            ? selectedFixtureShape?.m_radius
+            : null;
 
         Scene.resizeMode = {
           body: Scene.dragAndDrop.selectedBody,
           handle: position,
           startPoint: { x, y },
           originalFixtures,
-          selectedFixtureVertices,
+          selectedFixture: {
+            type: selectedFixtureType,
+            vertices: selectedFixtureVertices,
+            radius: selectedFixtureRadius,
+            center: selectedFixtureCenter,
+          },
           originalAABB: hasSelectedFixture
             ? getFixtureAABB(Scene.dragAndDrop.selectedFixture)
             : getBodyAABB(Scene.dragAndDrop.selectedBody),
