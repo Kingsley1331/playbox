@@ -393,9 +393,14 @@ const cloneBody = (e, rect, world) => {
     }
 
     // Copy other properties
-    newBody.setLinearVelocity(body.getLinearVelocity());
-    newBody.setAngularVelocity(body.getAngularVelocity());
-    newBody.setUserData(body.getUserData());
+
+    const linearVelocity = _.cloneDeep(body.getLinearVelocity());
+    const angularVelocity = _.cloneDeep(body.getAngularVelocity());
+    const userData = _.cloneDeep(body.getUserData());
+
+    newBody.setLinearVelocity(linearVelocity);
+    newBody.setAngularVelocity(angularVelocity);
+    newBody.setUserData(userData);
     Scene.clone.body = null;
     render(world, { x: 0, y: 0 });
   }
