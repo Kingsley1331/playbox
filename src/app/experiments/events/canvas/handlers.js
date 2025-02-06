@@ -568,20 +568,32 @@ function scaleBody(body, originalFixtures, scale) {
   render(Scene.world, { x: 0, y: 0 });
 }
 
-const scaleFixture = (fixture, scale) => {
+const scaleFixture = (fixture, body, scale) => {
   const shape = fixture.getShape();
   const isCircle = shape.getType() === "circle";
   const isPolygon = shape.getType() === "polygon";
   const selectedFixture = Scene.resizeMode.selectedFixture;
+
+  const offset = new Vec2(
+    selectedFixture.center.x - body.getPosition().x,
+    selectedFixture.center.y - body.getPosition().y
+  );
+
   if (isCircle) {
     shape.m_radius = selectedFixture.radius * scale;
   }
   if (isPolygon) {
     const referenceVertices = Scene.resizeMode.selectedFixture.vertices;
-    const vertices = shape.m_vertices;
-    vertices.forEach((v, i) => {
-      v.set(referenceVertices[i].x * scale, referenceVertices[i].y * scale);
-    });
+
+    const resizedVertices = referenceVertices
+      .map((v) => {
+        return new Vec2((v.x - offset.x) * scale, (v.y - offset.y) * scale);
+      })
+      .map((v) => {
+        return new Vec2(v.x + offset.x, v.y + offset.y);
+      });
+
+    updateFixtureVertices(body, fixture, resizedVertices);
   }
   return fixture;
 };
@@ -738,15 +750,17 @@ export function mouseDown(e) {
 
         const selectedFixtureVertices =
           hasSelectedFixture && selectedFixtureType === "polygon"
-            ? {
+            ? [
                 ...selectedFixtureShape.m_vertices.map((v) => {
                   return { x: v.x, y: v.y };
                 }),
-              }
+              ]
             : null;
 
         const selectedFixtureCenter = hasSelectedFixture
-          ? getFixtureCenter(Scene.dragAndDrop.selectedFixture)
+          ? getFixtureCenter(Scene.dragAndDrop.selectedFixture).add(
+              Scene.dragAndDrop.selectedBody.getPosition()
+            )
           : null;
 
         const selectedFixtureRadius =
@@ -825,10 +839,10 @@ const updateFixtureVertices = (body, fixture, newVertices) => {
   body.destroyFixture(fixture);
   Scene.dragAndDrop.selectedFixture = null;
 
-  fixture = body.createFixture(new pl.Polygon(newVertices), {
+  const newFixture = body.createFixture(new pl.Polygon(newVertices), {
     ...fixtureProperties,
   });
-  Scene.dragAndDrop.selectedFixture = fixture;
+  Scene.dragAndDrop.selectedFixture = newFixture;
 };
 
 const getFixtureCenter = (fixture) => {
@@ -1008,7 +1022,7 @@ export function mouseMove(e, setMousePosUI) {
       const fixtureCenter = getFixtureCenter(fixture);
       const currentAngle = Math.atan2(y - fixtureCenter.y, x - fixtureCenter.x);
       const deltaAngle = currentAngle - Scene.rotationMode.startAngle;
-      scaleFixture(fixture, scaleFactor);
+      scaleFixture(fixture, Scene.dragAndDrop.selectedBody, scaleFactor);
       render(Scene.world, { x: 0, y: 0 });
     }
   }
