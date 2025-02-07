@@ -583,17 +583,48 @@ const scaleFixture = (fixture, body, scale) => {
   const shape = fixture.getShape();
   const isCircle = shape.getType() === "circle";
   const isPolygon = shape.getType() === "polygon";
-  const selectedFixture = Scene.resizeMode.selectedFixture;
+  let selectedFixture = Scene.resizeMode.selectedFixture;
 
-  const offset = new Vec2(
-    selectedFixture.center.x - body.getPosition().x,
-    selectedFixture.center.y - body.getPosition().y
-  );
+  // const selectedFixture = Scene.dragAndDrop.selectedFixtur
+
+  const bodyPosition = body.getPosition();
+  let offset = new Vec2(0, 0);
+
+  if (isPolygon) {
+    offset = new Vec2(
+      selectedFixture.center.x - body.getPosition().x,
+      selectedFixture.center.y - body.getPosition().y
+    );
+  }
 
   if (isCircle) {
-    shape.m_radius = selectedFixture.radius * scale;
-  }
-  if (isPolygon) {
+    // selectedFixture = Scene.dragAndDrop.selectedFixture;
+    console.log("selectedFixture", selectedFixture);
+    // const center = new Vec2(
+    //   selectedFixture.center.x - bodyPosition.x,
+    //   selectedFixture.center.y - bodyPosition.y
+    // );
+    const selectedFixtureCenter = selectedFixture.center;
+    const selectedFixtureRadius = selectedFixture.radius;
+
+    console.log(
+      "selectedFixtureCircleCenter",
+      Scene.dragAndDrop.selectedFixture
+    );
+    console.log("selectedFixture.center", selectedFixtureCenter);
+
+    console.log("bodyPosition", bodyPosition);
+    // console.log("center", center);
+
+    updateCircleFixture(
+      body,
+      fixture,
+      selectedFixtureRadius * scale,
+      selectedFixtureCenter
+    );
+
+    console.log("selectedFixture.center", selectedFixtureCenter);
+  } else if (isPolygon) {
     const referenceVertices = Scene.resizeMode.selectedFixture.vertices;
 
     const resizedVertices = referenceVertices
@@ -768,15 +799,21 @@ export function mouseDown(e) {
               ]
             : null;
 
-        const selectedFixtureCenter = hasSelectedFixture
-          ? getFixtureCenter(Scene.dragAndDrop.selectedFixture).add(
-              Scene.dragAndDrop.selectedBody.getPosition()
-            )
-          : null;
+        const selectedFixtureCenter =
+          hasSelectedFixture && selectedFixtureType === "polygon"
+            ? getFixtureCenter(Scene.dragAndDrop.selectedFixture).add(
+                Scene.dragAndDrop.selectedBody.getPosition()
+              )
+            : null;
 
         const selectedFixtureRadius =
           hasSelectedFixture && selectedFixtureType === "circle"
             ? selectedFixtureShape?.m_radius
+            : null;
+
+        const selectedFixtureCircleCenter =
+          hasSelectedFixture && selectedFixtureType === "circle"
+            ? selectedFixtureShape?.m_p
             : null;
 
         Scene.resizeMode = {
@@ -788,7 +825,10 @@ export function mouseDown(e) {
             type: selectedFixtureType,
             vertices: selectedFixtureVertices,
             radius: selectedFixtureRadius,
-            center: selectedFixtureCenter,
+            center:
+              selectedFixtureType === "polygon"
+                ? selectedFixtureCenter
+                : selectedFixtureCircleCenter,
           },
           originalAABB: hasSelectedFixture
             ? getFixtureAABB(Scene.dragAndDrop.selectedFixture)
@@ -853,6 +893,23 @@ const updateFixtureVertices = (body, fixture, newVertices) => {
   const newFixture = body.createFixture(new pl.Polygon(newVertices), {
     ...fixtureProperties,
   });
+  Scene.dragAndDrop.selectedFixture = newFixture;
+};
+
+const updateCircleFixture = (body, fixture, newRadius, newCenter) => {
+  const fixtureProperties = {
+    density: fixture.getDensity(),
+    friction: fixture.getFriction(),
+    restitution: fixture.getRestitution(),
+  };
+  body.destroyFixture(fixture);
+  Scene.dragAndDrop.selectedFixture = null;
+
+  const newFixture = body.createFixture(new pl.Circle(newRadius), {
+    ...fixtureProperties,
+  });
+  newFixture.getShape().m_p.set(newCenter.x, newCenter.y);
+
   Scene.dragAndDrop.selectedFixture = newFixture;
 };
 
