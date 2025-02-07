@@ -1,5 +1,8 @@
 "use client";
+import planck, { Vec2 } from "planck";
 import { Scene } from "../World";
+
+const pl = planck;
 
 const { scale } = Scene;
 
@@ -299,10 +302,27 @@ export function getBodyAABB(body, selectedFixture) {
 }
 
 export function getFixtureAABB(fixture) {
-  console.log("fixture", fixture);
-  console.log("fixture.getAABB(0)", fixture.getAABB(0));
+  const shape = fixture.getShape();
+  const body = fixture.getBody();
+
+  if (shape.getType() === "circle") {
+    const radius = shape.getRadius();
+    const center = body.getWorldPoint(shape.getCenter());
+
+    return new pl.AABB(
+      new Vec2(center.x - radius, center.y - radius),
+      new Vec2(center.x + radius, center.y + radius)
+    );
+  }
+
+  // For non-circle fixtures, use the normal getAABB
   return fixture.getAABB(0); // Get AABB directly from fixture, 0 is the child index
 }
+// export function getFixtureAABB(fixture) {
+//   console.log("fixture", fixture);
+//   console.log("fixture.getAABB(0)", fixture.getAABB(0));
+//   return fixture.getAABB(0); // Get AABB directly from fixture, 0 is the child index
+// }
 
 export const drawSelectedFixtureOutline = (ctx, fixture, scale) => {
   if (!fixture) return;
