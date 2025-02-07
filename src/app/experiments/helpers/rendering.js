@@ -79,11 +79,7 @@ export function render(
 
     // Draw selection box if there's a selected fixture
     if (Scene.dragAndDrop.selectedFixture) {
-      drawSelectedFixtureBoundingBox(
-        ctx,
-        Scene.dragAndDrop.selectedFixture,
-        scale
-      );
+      drawSelectedFixtureOutline(ctx, Scene.dragAndDrop.selectedFixture, scale);
     }
 
     if (Scene.mode === "playing") {
@@ -303,16 +299,20 @@ export function getBodyAABB(body, selectedFixture) {
 }
 
 export function getFixtureAABB(fixture) {
+  console.log("fixture", fixture);
+  console.log("fixture.getAABB(0)", fixture.getAABB(0));
   return fixture.getAABB(0); // Get AABB directly from fixture, 0 is the child index
 }
 
-export const drawSelectedFixtureBoundingBox = (ctx, fixture, scale) => {
+export const drawSelectedFixtureOutline = (ctx, fixture, scale) => {
   if (!fixture) return;
 
   const shape = fixture.getShape();
   const body = fixture.getBody();
   const pos = body?.getPosition();
   const angle = body?.getAngle();
+
+  console.log("shape", shape);
 
   // Save current transform state
   ctx.save();

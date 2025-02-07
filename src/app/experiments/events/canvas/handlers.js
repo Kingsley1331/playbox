@@ -421,14 +421,11 @@ const cloneFixture = (e, rect, world, body) => {
     if (!fixture) return;
 
     const fixtureCenter = getFixtureCenter(fixture);
-    console.log("fixtureCenter", fixtureCenter);
 
     const offset = new Vec2(
       localMousePoint.x - fixtureCenter.x,
       localMousePoint.y - fixtureCenter.y
     );
-    console.log("offset", offset);
-
     // shift fixture position by offset vector
     const shape = { ...fixture.getShape() };
     const density = fixture.getDensity();
@@ -486,7 +483,6 @@ export const click = (e, rect, world) => {
     cloneBody(e, rect, world);
   }
   if (Scene.mode === "clone" && Scene.dragAndDrop.selectedFixture) {
-    console.log("cloneFixture");
     cloneFixture(e, rect, world, Scene.dragAndDrop.selectedBody);
   }
 
@@ -511,7 +507,7 @@ export const doubleClick = (e, rect, world) => {
     world.queryAABB(aabb, (fixture) => {
       if (fixture.testPoint(point)) {
         Scene.dragAndDrop.selectedFixture = fixture;
-        Scene.dragAndDrop.startMousePos = { x, y }; // Store initial mouse position
+        Scene.dragAndDrop.startMousePos = { x, y };
         render(world, { x: 0, y: 0 });
         return true;
       }
@@ -599,7 +595,7 @@ const scaleFixture = (fixture, body, scale) => {
 
   if (isCircle) {
     // selectedFixture = Scene.dragAndDrop.selectedFixture;
-    console.log("selectedFixture", selectedFixture);
+    // console.log("selectedFixture", selectedFixture);
     // const center = new Vec2(
     //   selectedFixture.center.x - bodyPosition.x,
     //   selectedFixture.center.y - bodyPosition.y
@@ -607,13 +603,13 @@ const scaleFixture = (fixture, body, scale) => {
     const selectedFixtureCenter = selectedFixture.center;
     const selectedFixtureRadius = selectedFixture.radius;
 
-    console.log(
-      "selectedFixtureCircleCenter",
-      Scene.dragAndDrop.selectedFixture
-    );
-    console.log("selectedFixture.center", selectedFixtureCenter);
+    // console.log(
+    //   "selectedFixtureCircleCenter",
+    //   Scene.dragAndDrop.selectedFixture
+    // );
+    // console.log("selectedFixture.center", selectedFixtureCenter);
 
-    console.log("bodyPosition", bodyPosition);
+    // console.log("bodyPosition", bodyPosition);
     // console.log("center", center);
 
     updateCircleFixture(
@@ -623,7 +619,7 @@ const scaleFixture = (fixture, body, scale) => {
       selectedFixtureCenter
     );
 
-    console.log("selectedFixture.center", selectedFixtureCenter);
+    // console.log("selectedFixture.center", selectedFixtureCenter);
   } else if (isPolygon) {
     const referenceVertices = Scene.resizeMode.selectedFixture.vertices;
 
@@ -834,6 +830,7 @@ export function mouseDown(e) {
             ? getFixtureAABB(Scene.dragAndDrop.selectedFixture)
             : getBodyAABB(Scene.dragAndDrop.selectedBody),
         };
+        render(Scene.world, { x: 0, y: 0 });
       }
     }
   }
@@ -863,7 +860,7 @@ const deleteSelected = (body, fixture) => {
 
       body.destroyFixture(fixture);
 
-      console.log("Number of fixtures:", fixtureCount);
+      // console.log("Number of fixtures:", fixtureCount);
       // Check if this was the last fixture
       if (fixtureCount === 1) {
         Scene.world.destroyBody(body);
@@ -1057,6 +1054,11 @@ export function mouseMove(e, setMousePosUI) {
     const width = aabb.upperBound.x - aabb.lowerBound.x;
     const height = aabb.upperBound.y - aabb.lowerBound.y;
 
+    console.log("aabb", aabb);
+    console.log(" Scene.resizeMode.startPoint", Scene.resizeMode.startPoint);
+    console.log("x", x);
+    console.log("y", y);
+
     // Calculate diagonal distance for uniform scaling
     const originalDiagonal = Math.sqrt(width * width + height * height);
     let newDiagonal;
@@ -1125,10 +1127,8 @@ export function mouseUp(e) {
     return;
   }
   if (Scene.mode === "rectangle") {
-    // const { x, y } = mousePosition(e, rect);
     const { x, y } = Scene.mousePos;
     Scene.rectangle.endPoint = { x, y };
-    console.log("Scene.rectangle.endPoint", Scene.rectangle.endPoint);
     Scene.rectangle.status = false;
     return;
   }
