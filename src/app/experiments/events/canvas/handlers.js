@@ -498,6 +498,8 @@ export const doubleClick = (e, rect, world) => {
   const { x, y } = mousePosition(e, rect);
 
   if (!Scene.dragAndDrop.selectedFixture) {
+    let selectedFixtureType;
+    let selectedFixture;
     const point = new Vec2(x, y);
     const aabb = new pl.AABB(
       new Vec2(x - 0.01, y - 0.01),
@@ -508,11 +510,31 @@ export const doubleClick = (e, rect, world) => {
       if (fixture.testPoint(point)) {
         Scene.dragAndDrop.selectedFixture = fixture;
         Scene.dragAndDrop.startMousePos = { x, y };
+        selectedFixtureType = fixture.getShape().getType();
+        selectedFixture = fixture;
         render(world, { x: 0, y: 0 });
         return true;
       }
       return false;
     });
+    /* the fixtures are updated to correctly calculate their boundin rect
+     this is due to a bug in planck.js that causes the body's bounding rect to be calculted instead */
+    const selectedBody = Scene.dragAndDrop.selectedBody;
+    if (selectedFixtureType === "polygon") {
+      updateFixtureVertices(
+        selectedBody,
+        selectedFixture,
+        selectedFixture.getShape().m_vertices
+      );
+    } else if (selectedFixtureType === "circle") {
+      updateCircleFixture(
+        selectedBody,
+        selectedFixture,
+        selectedFixture.getShape().m_radius,
+        selectedFixture.getShape().m_p
+      );
+    }
+    render(world, { x: 0, y: 0 });
     return;
   }
 
@@ -594,23 +616,8 @@ const scaleFixture = (fixture, body, scale) => {
   }
 
   if (isCircle) {
-    // selectedFixture = Scene.dragAndDrop.selectedFixture;
-    // console.log("selectedFixture", selectedFixture);
-    // const center = new Vec2(
-    //   selectedFixture.center.x - bodyPosition.x,
-    //   selectedFixture.center.y - bodyPosition.y
-    // );
     const selectedFixtureCenter = selectedFixture.center;
     const selectedFixtureRadius = selectedFixture.radius;
-
-    // console.log(
-    //   "selectedFixtureCircleCenter",
-    //   Scene.dragAndDrop.selectedFixture
-    // );
-    // console.log("selectedFixture.center", selectedFixtureCenter);
-
-    // console.log("bodyPosition", bodyPosition);
-    // console.log("center", center);
 
     updateCircleFixture(
       body,
@@ -618,8 +625,6 @@ const scaleFixture = (fixture, body, scale) => {
       selectedFixtureRadius * scale,
       selectedFixtureCenter
     );
-
-    // console.log("selectedFixture.center", selectedFixtureCenter);
   } else if (isPolygon) {
     const referenceVertices = Scene.resizeMode.selectedFixture.vertices;
 

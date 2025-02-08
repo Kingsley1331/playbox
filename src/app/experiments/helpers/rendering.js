@@ -305,6 +305,9 @@ export function getFixtureAABB(fixture) {
   const shape = fixture.getShape();
   const body = fixture.getBody();
 
+  // There is a bug in the planck library where the AABB is not correctly calculated for circles
+  // So we need to manually calculate the AABB for circles
+  // This bug only occurs when the body is stationary when the physics engine is not running
   if (shape.getType() === "circle") {
     const radius = shape.getRadius();
     const center = body.getWorldPoint(shape.getCenter());
