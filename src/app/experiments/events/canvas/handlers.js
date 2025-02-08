@@ -677,12 +677,13 @@ function getWorldPoint(localX, localY, body) {
 }
 
 export function mouseDown(e) {
+  let fixtureCount = 0;
   const rect = Scene.canvas.element.getBoundingClientRect();
   const x = (e.clientX - rect.left) / Scene.scale;
   const y = -(e.clientY - rect.top) / Scene.scale;
 
   if (Scene.dragAndDrop.selectedBody) {
-    const fixtureCount = getFixtureCount(Scene.dragAndDrop.selectedBody);
+    fixtureCount = getFixtureCount(Scene.dragAndDrop.selectedBody);
   }
 
   // Check if clicking a vertex of the selected body
@@ -937,12 +938,13 @@ export function mouseMove(e, setMousePosUI) {
     const shape = Scene.vertexDragMode.fixture.getShape();
 
     if (shape.getType() === "polygon") {
+      const clonedVertices = _.cloneDeep(shape.m_vertices);
       // Update the vertex position
-      shape.m_vertices[Scene.vertexDragMode.vertexIndex].x = localPoint.x;
-      shape.m_vertices[Scene.vertexDragMode.vertexIndex].y = localPoint.y;
+      clonedVertices[Scene.vertexDragMode.vertexIndex].x = localPoint.x;
+      clonedVertices[Scene.vertexDragMode.vertexIndex].y = localPoint.y;
 
       // Validate the new polygon shape
-      const vertices = shape.m_vertices;
+      let vertices = clonedVertices;
       let isValid = true;
 
       // Check if the polygon is still convex and not self-intersecting
@@ -970,6 +972,12 @@ export function mouseMove(e, setMousePosUI) {
           vertices[i].y = Scene.vertexDragMode.originalVertices[i].y;
         }
       }
+
+      updateFixtureVertices(
+        Scene.dragAndDrop.selectedBody,
+        Scene.dragAndDrop.selectedFixture,
+        vertices
+      );
     }
     Scene.dragAndDrop.selectedBody.resetMassData();
     render(Scene.world, { x: 0, y: 0 });
