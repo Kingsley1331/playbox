@@ -192,22 +192,18 @@ const createFixtureAndAddToBody = (
   const bodyPos = body.getPosition();
   const bodyAngle = -body.getAngle();
   const { x, y } = isCustomPolyline ? center : Scene.mousePos; // center of fixture as defined by vertices
-  const rotatedVertices = vertices.map((v) => {
+  const offset = new Vec2(x - bodyPos.x, y - bodyPos.y);
+
+  const offsetVertices = vertices.map((v) => {
+    return new Vec2(v.x + offset.x, v.y + offset.y);
+  });
+
+  const rotatedOffsetVertices = offsetVertices.map((v) => {
     return rotateVector(v, bodyAngle);
   });
 
-  const offset = new Vec2(x - bodyPos.x, y - bodyPos.y);
-
-  const rotatedOffset = rotateVector(offset, bodyAngle);
-
-  const offsetVertices = (isCustomPolyline ? rotatedVertices : vertices).map(
-    (v) => {
-      return new Vec2(v.x + rotatedOffset.x, v.y + rotatedOffset.y);
-    }
-  );
-
   const polygonShape = new pl.Polygon(
-    Scene.isAddingFixture ? offsetVertices : vertices
+    Scene.isAddingFixture ? rotatedOffsetVertices : vertices
   );
   const fixture = body.createFixture(polygonShape, {
     density: 1.0,
@@ -240,12 +236,6 @@ const createPolylineShape = (world, points, isCustomPolyline = false) => {
   Scene.polylinePoints = [];
   render(world, { x: 0, y: 0 });
   return body;
-};
-
-const createBox = (e, rect, world) => {
-  if (Scene.mode !== "box" || !world) return;
-  createPolylineShape(world, BOX_VERTICES);
-  render(world, { x: 0, y: 0 });
 };
 
 const createPolygon = (e, rect, world) => {
@@ -289,6 +279,12 @@ const createCircle = (e, rect, world) => {
     restitution: 0.2,
   });
 
+  render(world, { x: 0, y: 0 });
+};
+
+const createBox = (world) => {
+  if (Scene.mode !== "box" || !world) return;
+  createPolylineShape(world, BOX_VERTICES);
   render(world, { x: 0, y: 0 });
 };
 
@@ -486,7 +482,7 @@ export const click = (e, rect, world) => {
     cloneFixture(e, rect, world, Scene.dragAndDrop.selectedBody);
   }
 
-  createBox(e, rect, world);
+  createBox(world);
   createCircle(e, rect, world);
   createPolygon(e, rect, world);
   createPolyline(e, rect, world);
@@ -866,8 +862,6 @@ const deleteSelected = (body, fixture) => {
 
       body.destroyFixture(fixture);
 
-      // console.log("Number of fixtures:", fixtureCount);
-      // Check if this was the last fixture
       if (fixtureCount === 1) {
         Scene.world.destroyBody(body);
         Scene.dragAndDrop.selectedBody = null;
@@ -1066,11 +1060,6 @@ export function mouseMove(e, setMousePosUI) {
     const aabb = Scene.resizeMode.originalAABB;
     const width = aabb.upperBound.x - aabb.lowerBound.x;
     const height = aabb.upperBound.y - aabb.lowerBound.y;
-
-    console.log("aabb", aabb);
-    console.log(" Scene.resizeMode.startPoint", Scene.resizeMode.startPoint);
-    console.log("x", x);
-    console.log("y", y);
 
     // Calculate diagonal distance for uniform scaling
     const originalDiagonal = Math.sqrt(width * width + height * height);
